@@ -15,8 +15,8 @@ import site.anish_karthik.upi_net_banking.server.model.enums.TransferType;
 @Data
 public class BankTransfer {
     private String referenceId;
-    private Long payerTransactionId;
-    private Long payeeTransactionId;
+    private long payerTransactionId;
+    private long payeeTransactionId;
     private TransferType transferType;
     private Timestamp startedAt;
     private Timestamp endedAt;

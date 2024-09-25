@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class Bank {
-    private Long id;
     private String name;
+    private String code;
+    private long id;
 }

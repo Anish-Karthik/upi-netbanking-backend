@@ -4,14 +4,14 @@ import site.anish_karthik.upi_net_banking.server.model.Permission;
 
 // Concrete Strategies
 public class SendMoneyPermissionStrategy implements PermissionStrategy {
-    private final Permission permissions;
+    private final Permission permission;
 
-    public SendMoneyPermissionStrategy(Permission permissions) {
-        this.permissions = permissions;
+    public SendMoneyPermissionStrategy(Permission permission) {
+        this.permission = permission;
     }
 
     @Override
     public boolean canPerformAction() {
-        return permissions.getCanSendMoney();
+        return permission.isCanSendMoney();
     }
 }

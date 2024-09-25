@@ -9,9 +9,9 @@ import java.sql.Timestamp;
 
 // TransactionFactory
 public class TransactionFactory {
-    public static Transaction createDepositTransaction(Long bankAccId, Long userId, BigDecimal amount) {
+    public static Transaction createDepositTransaction(String accNo, Long userId, BigDecimal amount) {
         return Transaction.builder()
-                .bankAccId(bankAccId)
+                .accNo(accNo)
                 .userId(userId)
                 .amount(amount)
                 .transactionType(TransactionType.DEPOSIT)
@@ -20,9 +20,9 @@ public class TransactionFactory {
                 .build();
     }
 
-    public static Transaction createWithdrawalTransaction(Long bankAccId, Long userId, BigDecimal amount) {
+    public static Transaction createWithdrawalTransaction(String accNo, Long userId, BigDecimal amount) {
         return Transaction.builder()
-                .bankAccId(bankAccId)
+                .accNo(accNo)
                 .userId(userId)
                 .amount(amount)
                 .transactionType(TransactionType.WITHDRAWAL)

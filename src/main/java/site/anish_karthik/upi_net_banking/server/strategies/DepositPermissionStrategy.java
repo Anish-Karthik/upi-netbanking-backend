@@ -4,14 +4,14 @@ import site.anish_karthik.upi_net_banking.server.model.Permission;
 
 // Concrete Strategies
 public class DepositPermissionStrategy implements PermissionStrategy {
-    private final Permission permissions;
+    private final Permission permission;
 
-    public DepositPermissionStrategy(Permission permissions) {
-        this.permissions = permissions;
+    public DepositPermissionStrategy(Permission permission) {
+        this.permission = permission;
     }
 
     @Override
     public boolean canPerformAction() {
-        return permissions.getCanDeposit();
+        return permission.isCanDeposit();
     }
 }

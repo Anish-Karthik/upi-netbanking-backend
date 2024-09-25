@@ -11,9 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class Upi {
     private String upiId;
-    private Long bankAccId;
+    private String accNo;
     private String upiPinHashed;
-    private Long userId;
-    private Boolean isDefault;
-    private Boolean isMerchant;
+    private long userId;
+    private boolean isDefault;
 }

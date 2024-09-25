@@ -15,14 +15,15 @@ import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 @Builder
 @Data
 public class Transaction {
-    private Long transactionId;
-    private Long bankAccId;
-    private Long userId;
+    private long transactionId;
+    private String accNo;
+    private long userId;
     private BigDecimal amount;
-    private Timestamp startedAt;
-    private Timestamp endedAt;
-    private Long byCardId;
-    private String upiId;
     private TransactionType transactionType;
     private TransactionStatus transactionStatus;
+    private String byCardNo;
+    private String upiId;
+    private Timestamp startedAt;
+    private Timestamp endedAt;
+    private String referenceId;
 }

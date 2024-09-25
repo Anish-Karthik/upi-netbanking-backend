@@ -15,9 +15,8 @@ import site.anish_karthik.upi_net_banking.server.model.enums.CardType;
 @Builder
 @Data
 public class Card {
-    private Long id;
-    private Long bankAccountId;
-    private String cardNumber;
+    private String cardNo;
+    private String accNo;
     private String cvvHashed;
     private Date validFrom;
     private Date validTill;
@@ -25,5 +24,5 @@ public class Card {
     private CardType cardType;
     private CardCategory cardCategory;
     private String atmPinHashed;
-    private Long bankUserId;
+    private long userId;
 }
