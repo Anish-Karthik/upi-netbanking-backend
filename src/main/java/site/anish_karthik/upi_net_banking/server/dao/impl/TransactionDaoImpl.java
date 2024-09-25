@@ -114,6 +114,70 @@ public class TransactionDaoImpl implements TransactionDao {
         }
     }
 
+    @Override
+    public List<Transaction> findByAccNo(String accNo) {
+        String sql = "SELECT * FROM transaction WHERE acc_no = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, accNo);
+            ResultSet rs = stmt.executeQuery();
+            List<Transaction> transactions = new ArrayList<>();
+            while (rs.next()) {
+                transactions.add(mapResultSetToTransaction(rs));
+            }
+            return transactions;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Transaction> findByUpiId(String upiId) {
+        String sql = "SELECT * FROM transaction WHERE upi_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, upiId);
+            ResultSet rs = stmt.executeQuery();
+            List<Transaction> transactions = new ArrayList<>();
+            while (rs.next()) {
+                transactions.add(mapResultSetToTransaction(rs));
+            }
+            return transactions;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Transaction> findByCard(String status) {
+        String sql = "SELECT * FROM transaction WHERE card = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, status);
+            ResultSet rs = stmt.executeQuery();
+            List<Transaction> transactions = new ArrayList<>();
+            while (rs.next()) {
+                transactions.add(mapResultSetToTransaction(rs));
+            }
+            return transactions;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Transaction> findByReferenceId(String referenceId) {
+        String sql = "SELECT * FROM transaction WHERE reference_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, referenceId);
+            ResultSet rs = stmt.executeQuery();
+            List<Transaction> transactions = new ArrayList<>();
+            while (rs.next()) {
+                transactions.add(mapResultSetToTransaction(rs));
+            }
+            return transactions;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Transaction mapResultSetToTransaction(ResultSet rs) throws SQLException {
         Transaction transaction = new Transaction();
         transaction.setTransactionId(rs.getLong("transaction_id"));
