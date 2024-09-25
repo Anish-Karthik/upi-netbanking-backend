@@ -1,18 +1,15 @@
 package site.anish_karthik.upi_net_banking.server.model;
 
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "bank")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Data
 public class Bank {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
-
-    @Column(name = "name", nullable = false)
     private String name;
-
-    // Getters and Setters
 }

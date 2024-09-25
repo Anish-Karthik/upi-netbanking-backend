@@ -1,31 +1,19 @@
 package site.anish_karthik.upi_net_banking.server.model;
 
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "upi")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Data
 public class Upi {
-
-    @Id
-    @Column(name = "upi_id", length = 50)
     private String upiId;
-
-    @ManyToOne
-    @JoinColumn(name = "bank_acc_id", nullable = false)
-    private BankAccount bankAccount;
-
-    @Column(name = "upi_pin_hashed", nullable = false)
+    private Long bankAccId;
     private String upiPinHashed;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @Column(name = "is_default", nullable = false)
-    private boolean isDefault;
-
-    @Column(name = "is_merchant", nullable = false)
-    private boolean isMerchant;
-
-    // Getters and Setters
+    private Long userId;
+    private Boolean isDefault;
+    private Boolean isMerchant;
 }

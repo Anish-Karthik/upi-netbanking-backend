@@ -1,33 +1,19 @@
 package site.anish_karthik.upi_net_banking.server.model;
 
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "beneficiary")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Data
 public class Beneficiary {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
-
-    @Column(name = "name", nullable = false)
     private String name;
-
-    @ManyToOne
-    @JoinColumn(name = "acc_no")
-    private BankAccount bankAccount;
-
-    @ManyToOne
-    @JoinColumn(name = "beneficiary_of_id", nullable = false)
-    private User beneficiaryOf;
-
-    @Column(name = "description")
+    private String accNo;
+    private Long beneficiaryOfId;
     private String description;
-
-    @ManyToOne
-    @JoinColumn(name = "upi_id")
-    private Upi upi;
-
-    // Getters and Setters
+    private String upiId;
 }
