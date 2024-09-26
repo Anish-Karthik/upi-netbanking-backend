@@ -2,6 +2,7 @@ package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.UserDao;
 import site.anish_karthik.upi_net_banking.server.model.User;
+import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class UserDaoImpl implements UserDao {
                 ResultSet rs = stmt.executeQuery()) {
             List<User> users = new ArrayList<>();
             while (rs.next()) {
-                users.add(mapResultSetToUser(rs));
+                users.add(ResultSetMapper.mapResultSetToObject(rs, User.class));
             }
             return users;
         } catch (SQLException e) {
@@ -99,7 +100,7 @@ public class UserDaoImpl implements UserDao {
             }
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToUser(rs));
+                return Optional.of(ResultSetMapper.mapResultSetToObject(rs, User.class));
             }
             return Optional.empty();
         } catch (SQLException e) {
@@ -107,18 +108,6 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
-    private User mapResultSetToUser(ResultSet rs) throws SQLException {
-        User user = User.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .email(rs.getString("email"))
-                .phone(rs.getString("phone"))
-                .password(rs.getString("password"))
-                .address(rs.getString("address"))
-                .dob(rs.getDate("dob"))
-                .build();
-        return user;
-    }
 
     private void setFields(User user, PreparedStatement stmt) throws SQLException {
         stmt.setString(1, user.getName());
