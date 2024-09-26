@@ -11,13 +11,14 @@ import java.sql.SQLException;
 public class DatabaseUtil {
     private static Connection connection;
 
-    public static Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException, ClassNotFoundException {
         if (connection == null || connection.isClosed()) {
             synchronized (DatabaseUtil.class) {
+                Class.forName("com.mysql.cj.jdbc.Driver");
                 if (connection == null || connection.isClosed()) {
-                    String url = "jdbc:mysql://localhost:3306/your_database";
-                    String username = "your_username";
-                    String password = "your_password";
+                    String url = "jdbc:mysql://localhost:3306/upi-banking";
+                    String username = "root";
+                    String password = "rootroot";
                     connection = DriverManager.getConnection(url, username, password);
                 }
             }

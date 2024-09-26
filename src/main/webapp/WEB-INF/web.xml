@@ -3,4 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
+<!--    <session-config>-->
+<!--        <session-timeout>30</session-timeout>  &lt;!&ndash; Session timeout in minutes &ndash;&gt;-->
+<!--        <cookie-config>-->
+<!--            <http-only>true</http-only>        &lt;!&ndash; Enforces HttpOnly cookie &ndash;&gt;-->
+<!--            <secure>true</secure>              &lt;!&ndash; Enforces HTTPS only &ndash;&gt;-->
+<!--        </cookie-config>-->
+<!--    </session-config>-->
+<!--    <filter>-->
+<!--        <filter-name>AuthenticationFilter</filter-name>-->
+<!--        <filter-class>site.anish_karthik.upi_net_banking.server.filter.AuthenticationFilter</filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>AuthenticationFilter</filter-name>-->
+<!--        <url-pattern>/api/*</url-pattern>-->
+<!--    </filter-mapping>-->
 </web-app>

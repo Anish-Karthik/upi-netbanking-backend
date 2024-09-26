@@ -17,12 +17,10 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User save(User user) {
-        String sql = "INSERT INTO user (name, email) VALUES (?, ?)";
+        String sql = "INSERT INTO user (name, email, phone, password, address, dob) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, user.getName());
-            stmt.setString(2, user.getEmail());
+            setFields(user, stmt);
             stmt.executeUpdate();
-
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
                 user.setId(rs.getLong(1));
@@ -56,11 +54,10 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User update(User user) {
-        String sql = "UPDATE user SET name = ?, email = ? WHERE id = ?";
+        String sql = "UPDATE user SET name = ?, email = ?, phone = ?, password = ?, address = ?, dob = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, user.getName());
-            stmt.setString(2, user.getEmail());
-            stmt.setLong(3, user.getId());
+            setFields(user, stmt);
+            stmt.setLong(7, user.getId());
             stmt.executeUpdate();
             return user;
         } catch (SQLException e) {
@@ -111,10 +108,24 @@ public class UserDaoImpl implements UserDao {
     }
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
-        User user = new User();
-        user.setId(rs.getLong("id"));
-        user.setName(rs.getString("name"));
-        user.setEmail(rs.getString("email"));
+        User user = User.builder()
+                .id(rs.getLong("id"))
+                .name(rs.getString("name"))
+                .email(rs.getString("email"))
+                .phone(rs.getString("phone"))
+                .password(rs.getString("password"))
+                .address(rs.getString("address"))
+                .dob(rs.getDate("dob"))
+                .build();
         return user;
+    }
+
+    private void setFields(User user, PreparedStatement stmt) throws SQLException {
+        stmt.setString(1, user.getName());
+        stmt.setString(2, user.getEmail());
+        stmt.setString(3, user.getPhone());
+        stmt.setString(4, user.getPassword());
+        stmt.setString(5, user.getAddress());
+        stmt.setDate(6, user.getDob());
     }
 }
