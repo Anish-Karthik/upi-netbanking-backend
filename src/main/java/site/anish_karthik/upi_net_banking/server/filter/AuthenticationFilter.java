@@ -28,22 +28,22 @@ public class AuthenticationFilter implements Filter {
         // Check if there's a session
         HttpSession session = httpRequest.getSession(false);
 
-        if (session != null && session.getAttribute("user") != null) {
+//        if (session != null && session.getAttribute("user") != null) {
             // User is authenticated
             chain.doFilter(request, response);
-        } else {
-            // Check if SESSIONID cookie is present
-            Optional<Cookie> sessionCookie = getSessionCookie(httpRequest);
-
-            if (sessionCookie.isPresent() && session != null) {
-                // If session cookie exists, but session is invalid, invalidate it
-                session.invalidate();
-            }
-
-            // Redirect to login page if the user is not authenticated
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            httpResponse.getWriter().write("Unauthorized. Please login.");
-        }
+//        } else {
+//            // Check if SESSIONID cookie is present
+//            Optional<Cookie> sessionCookie = getSessionCookie(httpRequest);
+//
+//            if (sessionCookie.isPresent() && session != null) {
+//                // If session cookie exists, but session is invalid, invalidate it
+//                session.invalidate();
+//            }
+//
+//            // Redirect to login page if the user is not authenticated
+//            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            httpResponse.getWriter().write("Unauthorized. Please login.");
+//        }
     }
 
     @Override
