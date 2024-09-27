@@ -60,4 +60,8 @@ public class JsonParser {
     public static <T> T parse(String json, Class<T> clazz) throws IOException {
         return objectMapper.readValue(json, clazz);
     }
+
+    public static String toJson(Object obj) throws IOException {
+        return objectMapper.writeValueAsString(obj);
+    }
 }

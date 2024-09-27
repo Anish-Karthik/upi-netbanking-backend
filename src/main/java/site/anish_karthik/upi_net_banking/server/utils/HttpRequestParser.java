@@ -1,6 +1,7 @@
 package site.anish_karthik.upi_net_banking.server.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -71,5 +72,24 @@ public class HttpRequestParser {
         data.put("params", pathParams);
 
         return JsonParser.parse(data, clazz);
+    }
+
+    public static void writeJson(HttpServletResponse response, Object data) throws IOException {
+        response.getWriter().write(JsonParser.toJson(data));
+    }
+
+    public static void writeJson(HttpServletResponse response, int status, Object data) throws IOException {
+        response.setStatus(status);
+        writeJson(response, data);
+    }
+
+    public static void writeJson(HttpServletResponse response, int status, String error) throws IOException {
+        response.setStatus(status);
+        response.getWriter().write(JsonParser.toJson(Map.of("error", error)));
+    }
+
+    public static void writeJson(HttpServletResponse response, int status, String message, Object data) throws IOException {
+        response.setStatus(status);
+        response.getWriter().write(JsonParser.toJson(Map.of("message", message, "data", data)));
     }
 }

@@ -5,6 +5,7 @@ import site.anish_karthik.upi_net_banking.server.dao.BankDao;
 import site.anish_karthik.upi_net_banking.server.model.Bank;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public class BankServiceImpl implements BankService {
@@ -15,13 +16,13 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
-    public void createBank(Bank bank) {
-        bankDao.save(bank);
+    public Bank createBank(Bank bank) {
+        return bankDao.save(bank);
     }
 
     @Override
-    public Bank getBankById(long id) {
-        return bankDao.findById(id).orElse(null);
+    public Optional<Bank> getBankById(long id) {
+        return bankDao.findById(id);
     }
 
     @Override
@@ -30,8 +31,8 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
-    public void updateBank(Bank bank) {
-        bankDao.update(bank);
+    public Bank updateBank(Bank bank) {
+        return bankDao.update(bank);
     }
 
     @Override
