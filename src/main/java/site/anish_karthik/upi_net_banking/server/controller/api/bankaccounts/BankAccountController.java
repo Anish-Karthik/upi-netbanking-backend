@@ -6,6 +6,7 @@ import site.anish_karthik.upi_net_banking.server.dto.CreateBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.dto.GetBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.dto.UpdateBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
+import site.anish_karthik.upi_net_banking.server.model.enums.AccountStatus;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.impl.BankAccountServiceImpl;
 
@@ -119,9 +120,10 @@ public class BankAccountController extends HttpServlet {
         try {
             var params = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/accounts/(\\d+)", UserAccountParams.class);
             if (params.getUserId() != null && params.getAccNo() != null) {
-                BankAccount account = bankAccountService.getBankAccountByAccNo(params.getAccNo());
+                var account = bankAccountService.getBankAccountByAccNo(params.getAccNo());
                 if (account != null) {
-                    bankAccountService.deleteBankAccount(params.getAccNo());
+                    account.setStatus(AccountStatus.CLOSED);
+                    bankAccountService.updateBankAccount(account);
                     ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account deleted", account);
                 } else {
                     ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_NOT_FOUND, "Account not found", null);
