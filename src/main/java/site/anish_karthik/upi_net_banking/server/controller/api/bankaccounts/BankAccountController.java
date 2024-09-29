@@ -124,7 +124,8 @@ public class BankAccountController extends HttpServlet {
                 if (account != null) {
                     account.setStatus(AccountStatus.CLOSED);
                     bankAccountService.updateBankAccount(account);
-                    ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account deleted", account);
+                    account.setAccNo(params.getAccNo());
+                    ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account closed", account);
                 } else {
                     ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_NOT_FOUND, "Account not found", null);
                 }

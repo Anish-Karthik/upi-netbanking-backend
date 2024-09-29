@@ -4,6 +4,8 @@ import site.anish_karthik.upi_net_banking.server.dao.CardDao;
 import site.anish_karthik.upi_net_banking.server.model.Card;
 import site.anish_karthik.upi_net_banking.server.model.enums.CardCategory;
 import site.anish_karthik.upi_net_banking.server.model.enums.CardStatus;
+import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
+import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.Optional;
 
 public class CardDaoImpl implements CardDao {
     private final Connection connection;
+    private final QueryBuilderUtil queryBuilderUtil = new QueryBuilderUtil();
 
     public CardDaoImpl(Connection connection) {
         this.connection = connection;
@@ -19,26 +22,18 @@ public class CardDaoImpl implements CardDao {
 
     @Override
     public Card save(Card card) {
-        String sql = "INSERT INTO card (card_no, user_id, card_category, status, atm_pin_hashed, cvv_hashed, valid_till, vall_from) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, card.getCardNo());
-            stmt.setLong(2, card.getUserId());
-            stmt.setString(3, card.getCardCategory().name());
-            stmt.setString(4, card.getStatus().name());
-            stmt.setString(5, card.getAtmPinHashed());
-            stmt.setString(6, card.getCvvHashed());
-            stmt.setDate(7, Date.valueOf(card.getValidTill().toLocalDate()));
-            stmt.setDate(8, Date.valueOf(card.getValidFrom().toLocalDate()));
-            stmt.executeUpdate();
+        try {
+            QueryResult queryResult = queryBuilderUtil.createInsertQuery("card", card);
+            queryBuilderUtil.executeDynamicQuery(connection, queryResult);
             return card;
-        } catch (SQLException e) {
+        } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Optional<Card> findById(Long id) {
-        String sql = "SELECT * FROM card WHERE id = ?";
+    public Optional<Card> findById(String id) {
+        String sql = "SELECT * FROM card WHERE card_no = ?";
         return getCard(id, sql);
     }
 
@@ -59,28 +54,20 @@ public class CardDaoImpl implements CardDao {
 
     @Override
     public Card update(Card card) {
-        String sql = "UPDATE card SET user_id = ?, card_category = ?, status = ?, atm_pin_hashed = ?, cvv_hashed = ?, valid_till = ?, valid_from = ? WHERE card_no = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, card.getUserId());
-            stmt.setString(2, card.getCardCategory().name());
-            stmt.setString(3, card.getStatus().name());
-            stmt.setString(4, card.getAtmPinHashed());
-            stmt.setString(5, card.getCvvHashed());
-            stmt.setDate(6, Date.valueOf(card.getValidTill().toLocalDate()));
-            stmt.setDate(7, Date.valueOf(card.getValidFrom().toLocalDate()));
-            stmt.setString(8, card.getCardNo());
-            stmt.executeUpdate();
+        try {
+            QueryResult queryResult = queryBuilderUtil.createUpdateQuery("card", card, "card_no", card.getCardNo());
+            queryBuilderUtil.executeDynamicQuery(connection, queryResult);
             return card;
-        } catch (SQLException e) {
+        } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void delete(Long id) {
-        String sql = "DELETE FROM card WHERE id = ?";
+    public void delete(String id) {
+        String sql = "DELETE FROM card WHERE card_no = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, id);
+            stmt.setString(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

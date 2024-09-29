@@ -2,6 +2,8 @@ package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.UpiDao;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
+import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
+import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,30 +12,26 @@ import java.util.Optional;
 
 public class UpiDaoImpl implements UpiDao {
     private final Connection connection;
-
+    private final QueryBuilderUtil queryBuilderUtil = new QueryBuilderUtil();
     public UpiDaoImpl(Connection connection) {
         this.connection = connection;
     }
 
     @Override
     public Upi save(Upi upi) {
-        String sql = "INSERT INTO upi (user_id, upi_id, upi_pin_hashed, is_default) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setLong(1, upi.getUserId());
-            stmt.setString(2, upi.getUpiId());
-            stmt.setString(3, upi.getUpiPinHashed());
-            stmt.setBoolean(4, upi.isDefault());
-            stmt.executeUpdate();
-
+        try {
+            QueryResult queryResult = queryBuilderUtil.createInsertQuery("upi", upi);
+            queryBuilderUtil.executeDynamicQuery(connection, queryResult);
             return upi;
-        } catch (SQLException e) {
+        } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     @Override
     public Optional<Upi> findById(String id) {
-        String sql = "SELECT * FROM upi WHERE id = ?";
+        String sql = "SELECT * FROM upi WHERE upi_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -63,22 +61,18 @@ public class UpiDaoImpl implements UpiDao {
 
     @Override
     public Upi update(Upi upi) {
-        String sql = "UPDATE upi SET user_id = ?, upi_id = ?, upi_pin_hashed = ?, is_default = ? WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, upi.getUserId());
-            stmt.setString(2, upi.getUpiId());
-            stmt.setString(3, upi.getUpiPinHashed());
-            stmt.setBoolean(4, upi.isDefault());
-            stmt.executeUpdate();
+        try {
+            QueryResult queryResult = queryBuilderUtil.createUpdateQuery("upi", upi, "upi_id", upi.getUpiId());
+            queryBuilderUtil.executeDynamicQuery(connection, queryResult);
             return upi;
-        } catch (SQLException e) {
+        } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public void delete(String id) {
-        String sql = "DELETE FROM upi WHERE id = ?";
+        String sql = "DELETE FROM upi WHERE upi_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, id);
             stmt.executeUpdate();
@@ -105,7 +99,8 @@ public class UpiDaoImpl implements UpiDao {
 
     @Override
     public List<Upi> findByAccNo(String accNo) {
-        String sql = "SELECT * FROM upi WHERE upi_id = ?";
+        System.out.println("accNo = " + accNo);
+        String sql = "SELECT * FROM upi WHERE acc_no = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, accNo);
             ResultSet rs = stmt.executeQuery();
@@ -124,7 +119,7 @@ public class UpiDaoImpl implements UpiDao {
         upi.setUserId(rs.getLong("user_id"));
         upi.setUpiId(rs.getString("upi_id"));
         upi.setUpiPinHashed(rs.getString("upi_pin_hashed"));
-        upi.setDefault(rs.getBoolean("is_default"));
+        upi.setIsDefault(rs.getBoolean("is_default"));
         return upi;
     }
 }

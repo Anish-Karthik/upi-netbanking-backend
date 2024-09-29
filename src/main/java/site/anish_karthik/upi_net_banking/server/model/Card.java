@@ -24,5 +24,5 @@ public class Card {
     private CardType cardType;
     private CardCategory cardCategory;
     private String atmPinHashed;
-    private long userId;
+    private Long userId;
 }

@@ -24,6 +24,11 @@ public class PathParamExtractor {
 
         // If the path matches the regex, proceed to extract parameters
         if (matcher.matches()) {
+            // Check if the DTO class is a String or a primitive type
+            if (dtoClass.equals(String.class) || dtoClass.isPrimitive()) {
+                return convertStringToType(matcher.group(1), dtoClass);
+            }
+
             // Create an instance of the DTO class
             System.out.println("I'm in extractPathParams" + matcher.toString());
             T paramsObject = dtoClass.getDeclaredConstructor().newInstance();
@@ -62,6 +67,39 @@ public class PathParamExtractor {
             return paramsObject;
         } else {
             throw new IllegalArgumentException("Path does not match the given regex");
+        }
+    }
+
+    /**
+     * Converts a string value to the specified type.
+     *
+     * @param value The string value to convert.
+     * @param type  The target type.
+     * @param <T>   The type parameter.
+     * @return The converted value.
+     */
+    @SuppressWarnings("unchecked")
+    private static <T> T convertStringToType(String value, Class<T> type) {
+        if (type.equals(String.class)) {
+            return (T) value;
+        } else if (type.equals(Integer.class) || type.equals(int.class)) {
+            return (T) Integer.valueOf(value);
+        } else if (type.equals(Long.class) || type.equals(long.class)) {
+            return (T) Long.valueOf(value);
+        } else if (type.equals(Double.class) || type.equals(double.class)) {
+            return (T) Double.valueOf(value);
+        } else if (type.equals(Float.class) || type.equals(float.class)) {
+            return (T) Float.valueOf(value);
+        } else if (type.equals(Boolean.class) || type.equals(boolean.class)) {
+            return (T) Boolean.valueOf(value);
+        } else if (type.equals(Byte.class) || type.equals(byte.class)) {
+            return (T) Byte.valueOf(value);
+        } else if (type.equals(Short.class) || type.equals(short.class)) {
+            return (T) Short.valueOf(value);
+        } else if (type.equals(Character.class) || type.equals(char.class)) {
+            return (T) Character.valueOf(value.charAt(0));
+        } else {
+            throw new IllegalArgumentException("Unsupported type: " + type);
         }
     }
 }
