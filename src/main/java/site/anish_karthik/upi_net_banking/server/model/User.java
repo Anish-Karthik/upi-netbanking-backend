@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class User {
-    private long id;
+    private Long id;
     private String phone;
     private String email;
     private String name;

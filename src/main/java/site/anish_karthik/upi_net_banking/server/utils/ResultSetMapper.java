@@ -2,6 +2,7 @@ package site.anish_karthik.upi_net_banking.server.utils;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -15,14 +16,20 @@ public class ResultSetMapper {
 
     static {
         typeConverters.put(long.class, value -> ((Number) value).longValue());
+        typeConverters.put(Long.class, value -> ((Number) value).longValue()); // Added converter for Long
         typeConverters.put(int.class, value -> ((Number) value).intValue());
+        typeConverters.put(Integer.class, value -> ((Number) value).intValue());
         typeConverters.put(double.class, value -> ((Number) value).doubleValue());
+        typeConverters.put(Double.class, value -> ((Number) value).doubleValue());
         typeConverters.put(float.class, value -> ((Number) value).floatValue());
+        typeConverters.put(Float.class, value -> ((Number) value).floatValue());
         typeConverters.put(boolean.class, value -> ((Boolean) value));
+        typeConverters.put(Boolean.class, value -> ((Boolean) value));
         typeConverters.put(String.class, Object::toString);
         typeConverters.put(java.sql.Date.class, value -> value instanceof Timestamp ? new java.sql.Date(((Timestamp) value).getTime()) : value);
         typeConverters.put(Timestamp.class, value -> value instanceof Timestamp ? (Timestamp) value : new Timestamp(((java.sql.Date) value).getTime()));
         typeConverters.put(BigDecimal.class, value -> new BigDecimal(value.toString()));
+        typeConverters.put(BigInteger.class, value -> ((BigInteger) value).longValue()); // Added converter for BigInteger
         // Add more type converters as needed
     }
 

@@ -18,4 +18,12 @@
 <!--        <filter-name>AuthenticationFilter</filter-name>-->
 <!--        <url-pattern>/api/*</url-pattern>-->
 <!--    </filter-mapping>-->
+<!--    <filter>-->
+<!--        <filter-name>UserValidationProfileFilter</filter-name>-->
+<!--        <filter-class>site.anish_karthik.upi_net_banking.server.filter.validator.UserProfileFilter</filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>UserValidationProfileFilter</filter-name>-->
+<!--        <url-pattern>/users/profile/*</url-pattern>-->
+<!--    </filter-mapping>-->
 </web-app>

@@ -2,6 +2,8 @@ package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.UserDao;
 import site.anish_karthik.upi_net_banking.server.model.User;
+import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
+import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
 
 import java.sql.*;
@@ -11,6 +13,7 @@ import java.util.Optional;
 
 public class UserDaoImpl implements UserDao {
     private final Connection connection;
+    private final QueryBuilderUtil queryBuilderUtil = new QueryBuilderUtil();
 
     public UserDaoImpl(Connection connection) {
         this.connection = connection;
@@ -55,15 +58,13 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User update(User user) {
-        String sql = "UPDATE user SET name = ?, email = ?, phone = ?, password = ?, address = ?, dob = ? WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            setFields(user, stmt);
-            stmt.setLong(7, user.getId());
-            stmt.executeUpdate();
-            return user;
-        } catch (SQLException e) {
+        try {
+            QueryResult queryResult = queryBuilderUtil.createUpdateQuery("user", user, "id", user.getId());
+            queryBuilderUtil.executeDynamicQuery(connection, queryResult);
+        } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
+        return user;
     }
 
     @Override

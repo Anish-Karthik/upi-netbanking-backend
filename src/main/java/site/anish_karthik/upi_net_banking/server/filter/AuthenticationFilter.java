@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 
-@WebFilter(urlPatterns = {"/api/*"})  // Apply the filter only to protected routes
+//@WebFilter(urlPatterns = {"/api/*"})  // Apply the filter only to protected routes
 public class AuthenticationFilter implements Filter {
 
     @Override
@@ -24,7 +24,7 @@ public class AuthenticationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-
+        System.out.println("HEY I'm A auth filter");
         // Check if there's a session
         HttpSession session = httpRequest.getSession(false);
 
