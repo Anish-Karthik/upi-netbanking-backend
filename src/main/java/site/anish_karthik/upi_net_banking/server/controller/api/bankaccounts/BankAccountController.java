@@ -3,6 +3,7 @@ package site.anish_karthik.upi_net_banking.server.controller.api.bankaccounts;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import site.anish_karthik.upi_net_banking.server.dto.CreateBankAccountDTO;
+import site.anish_karthik.upi_net_banking.server.dto.GetBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.dto.UpdateBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
@@ -51,7 +52,7 @@ public class BankAccountController extends HttpServlet {
 
             if (params.getUserId() != null && params.getAccNo() != null) {
                 // Extract the account number from URL
-                BankAccount account = bankAccountService.getBankAccountByAccNo(params.getAccNo());
+                GetBankAccountDTO account = bankAccountService.getBankAccountWithBankByAccNo(params.getAccNo());
                 if (account != null) {
                     ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account found", account);
                 } else {
@@ -60,7 +61,7 @@ public class BankAccountController extends HttpServlet {
             } else if (params.getUserId() != null) {
                 System.out.println("I'm in doGet: " + params.getUserId());
                 // If no specific account, retrieve by userId
-                List<BankAccount> accounts = bankAccountService.getBankAccountsByUserId(params.getUserId());
+                List<GetBankAccountDTO> accounts = bankAccountService.getBankAccountsWithBankByUserId(params.getUserId());
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Accounts found", accounts);
             }
         } catch (Exception e) {

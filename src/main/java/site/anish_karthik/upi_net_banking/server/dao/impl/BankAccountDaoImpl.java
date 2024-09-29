@@ -2,6 +2,7 @@ package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.BankAccountDao;
 import site.anish_karthik.upi_net_banking.server.dto.GetBankAccountDTO;
+import site.anish_karthik.upi_net_banking.server.model.Bank;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.enums.AccountStatus;
 import site.anish_karthik.upi_net_banking.server.model.enums.AccountType;
@@ -49,13 +50,11 @@ public class BankAccountDaoImpl implements BankAccountDao {
         }
     }
 
-
-
     @Override
     public List<BankAccount> findAll() {
         String sql = "SELECT * FROM bank_account";
         try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                ResultSet rs = stmt.executeQuery()) {
             List<BankAccount> bankAccounts = new ArrayList<>();
             while (rs.next()) {
                 bankAccounts.add(mapResultSetToBankAccount(rs));
@@ -128,7 +127,9 @@ public class BankAccountDaoImpl implements BankAccountDao {
             ResultSet rs = stmt.executeQuery();
             List<GetBankAccountDTO> bankAccounts = new ArrayList<>();
             while (rs.next()) {
-                bankAccounts.add(ResultSetMapper.mapResultSetToObject(rs, GetBankAccountDTO.class));
+                BankAccount bankAccount = ResultSetMapper.mapResultSetToObject(rs, BankAccount.class);
+                Bank bank = ResultSetMapper.mapResultSetToObject(rs, Bank.class);
+                bankAccounts.add(GetBankAccountDTO.fromBankAccount(bankAccount, bank));
             }
             return bankAccounts;
         } catch (SQLException e) {
@@ -143,7 +144,10 @@ public class BankAccountDaoImpl implements BankAccountDao {
             stmt.setString(1, accNo);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(ResultSetMapper.mapResultSetToObject(rs, GetBankAccountDTO.class));
+                System.out.println(rs);
+                BankAccount bankAccount = ResultSetMapper.mapResultSetToObject(rs, BankAccount.class);
+                Bank bank = ResultSetMapper.mapResultSetToObject(rs, Bank.class);
+                return Optional.of(GetBankAccountDTO.fromBankAccount(bankAccount, bank));
             }
             return Optional.empty();
         } catch (SQLException e) {

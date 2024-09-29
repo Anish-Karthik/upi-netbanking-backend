@@ -3,6 +3,7 @@ package site.anish_karthik.upi_net_banking.server.service.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.BankAccountDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.BankAccountDaoImpl;
+import site.anish_karthik.upi_net_banking.server.dto.GetBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
@@ -25,6 +26,16 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Override
     public List<BankAccount> getBankAccountsByUserId(long userId) {
         return bankAccountDao.findByUserId(userId);
+    }
+
+    @Override
+    public List<GetBankAccountDTO> getBankAccountsWithBankByUserId(long userId) {
+        return bankAccountDao.findByUserIdWithBank(userId);
+    }
+
+    @Override
+    public GetBankAccountDTO getBankAccountWithBankByAccNo(String accNo) {
+        return bankAccountDao.findByIdWithBank(accNo).orElse(null);
     }
 
     @Override

@@ -13,10 +13,14 @@ import java.util.function.Function;
 public class ResultSetMapper {
 
     private static final Map<Class<?>, Function<Object, ?>> typeConverters = new HashMap<>();
-
+    public static String toSnakeCase(String camelCase) {
+        String regex = "([a-z])([A-Z]+)";
+        String replacement = "$1_$2";
+        return camelCase.replaceAll(regex, replacement).toLowerCase();
+    }
     static {
         typeConverters.put(long.class, value -> ((Number) value).longValue());
-        typeConverters.put(Long.class, value -> ((Number) value).longValue());
+        typeConverters.put(Long.class, value -> ((Number) value).longValue()); // Added converter for Long
         typeConverters.put(int.class, value -> ((Number) value).intValue());
         typeConverters.put(Integer.class, value -> ((Number) value).intValue());
         typeConverters.put(double.class, value -> ((Number) value).doubleValue());
@@ -29,7 +33,8 @@ public class ResultSetMapper {
         typeConverters.put(java.sql.Date.class, value -> value instanceof Timestamp ? new java.sql.Date(((Timestamp) value).getTime()) : value);
         typeConverters.put(Timestamp.class, value -> value instanceof Timestamp ? (Timestamp) value : new Timestamp(((java.sql.Date) value).getTime()));
         typeConverters.put(BigDecimal.class, value -> new BigDecimal(value.toString()));
-        typeConverters.put(BigInteger.class, value -> ((BigInteger) value).longValue());
+        typeConverters.put(BigInteger.class, value -> ((BigInteger) value).longValue()); // Added converter for BigInteger
+        // Add more type converters as needed
     }
 
     public static <T> T mapResultSetToObject(ResultSet rs, Class<T> clazz) throws SQLException {
@@ -39,7 +44,7 @@ public class ResultSetMapper {
 
             for (Field field : fields) {
                 field.setAccessible(true);
-                String columnName = field.getName();
+                String columnName = toSnakeCase(field.getName());
                 Object value = rs.getObject(columnName);
 
                 if (value != null) {
@@ -50,10 +55,6 @@ public class ResultSetMapper {
                         @SuppressWarnings("unchecked")
                         Class<? extends Enum> enumType = (Class<? extends Enum>) field.getType();
                         field.set(instance, Enum.valueOf(enumType, value.toString()));
-                    } else if (field.getType().getDeclaredFields().length > 0) {
-                        // Handle nested class
-                        Object nestedObject = mapResultSetToObject(rs, field.getType());
-                        field.set(instance, nestedObject);
                     } else {
                         field.set(instance, value);
                     }
