@@ -2,6 +2,8 @@ package site.anish_karthik.upi_net_banking.server.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.IOException;
@@ -19,25 +21,21 @@ public class ResponseUtil {
         } else if (acceptHeader.contains("application/json") || acceptHeader.contains("*/*")) {
              response.setContentType("application/json");
              response.setStatus(statusCode);
-             response.getWriter().write(JsonParser
-                     .toJson(new ApiResponse(statusCode, message, Objects.requireNonNullElseGet(data, Object::new))));
+             var responseBuilder = ApiResponse.builder().statusCode(statusCode).message(message);
+             if (data != null) responseBuilder.data(data);
+            response.getWriter().write(JsonParser.toJson(responseBuilder.build()));
          } else {
             response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
             response.getWriter().write("Not acceptable");
         }
     }
 
+    @AllArgsConstructor
+    @Builder
     @Data
     private static class ApiResponse {
         private int statusCode;
         private String message;
         private Object data;
-
-        public ApiResponse(int statusCode, String message, Object data) {
-            this.statusCode = statusCode;
-            this.message = message;
-            this.data = data;
-        }
-
     }
 }

@@ -16,7 +16,7 @@ public class ResultSetMapper {
 
     static {
         typeConverters.put(long.class, value -> ((Number) value).longValue());
-        typeConverters.put(Long.class, value -> ((Number) value).longValue()); // Added converter for Long
+        typeConverters.put(Long.class, value -> ((Number) value).longValue());
         typeConverters.put(int.class, value -> ((Number) value).intValue());
         typeConverters.put(Integer.class, value -> ((Number) value).intValue());
         typeConverters.put(double.class, value -> ((Number) value).doubleValue());
@@ -29,8 +29,7 @@ public class ResultSetMapper {
         typeConverters.put(java.sql.Date.class, value -> value instanceof Timestamp ? new java.sql.Date(((Timestamp) value).getTime()) : value);
         typeConverters.put(Timestamp.class, value -> value instanceof Timestamp ? (Timestamp) value : new Timestamp(((java.sql.Date) value).getTime()));
         typeConverters.put(BigDecimal.class, value -> new BigDecimal(value.toString()));
-        typeConverters.put(BigInteger.class, value -> ((BigInteger) value).longValue()); // Added converter for BigInteger
-        // Add more type converters as needed
+        typeConverters.put(BigInteger.class, value -> ((BigInteger) value).longValue());
     }
 
     public static <T> T mapResultSetToObject(ResultSet rs, Class<T> clazz) throws SQLException {
@@ -51,6 +50,10 @@ public class ResultSetMapper {
                         @SuppressWarnings("unchecked")
                         Class<? extends Enum> enumType = (Class<? extends Enum>) field.getType();
                         field.set(instance, Enum.valueOf(enumType, value.toString()));
+                    } else if (field.getType().getDeclaredFields().length > 0) {
+                        // Handle nested class
+                        Object nestedObject = mapResultSetToObject(rs, field.getType());
+                        field.set(instance, nestedObject);
                     } else {
                         field.set(instance, value);
                     }

@@ -1,6 +1,9 @@
 package site.anish_karthik.upi_net_banking.server.controller.api.bankaccounts;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
+import site.anish_karthik.upi_net_banking.server.dto.CreateBankAccountDTO;
+import site.anish_karthik.upi_net_banking.server.dto.UpdateBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.impl.BankAccountServiceImpl;
@@ -11,12 +14,17 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
+import site.anish_karthik.upi_net_banking.server.utils.HttpRequestParser;
+import site.anish_karthik.upi_net_banking.server.utils.PathParamExtractor;
+import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-@WebServlet("/api/accounts/*") // RESTful endpoint
+@WebServlet("/api/user/*") // RESTful endpoint
 public class BankAccountController extends HttpServlet {
 
     private final BankAccountService bankAccountService;
@@ -24,92 +32,105 @@ public class BankAccountController extends HttpServlet {
     {
         try {
             bankAccountService = new BankAccountServiceImpl();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
-
-    private final ObjectMapper objectMapper = new ObjectMapper(); // Jackson ObjectMapper for JSON serialization
-
+    @Data
+    public static class UserAccountParams {
+        private Long userId;
+        private String accNo;
+    }
+    Logger LOGGER = Logger.getLogger(BankAccountController.class.getName());
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//        /api/users/userId/accounts
         String pathInfo = req.getPathInfo();
-        if (pathInfo != null && pathInfo.length() > 1) {
-            // Extract the account number from URL
-            String accNo = pathInfo.substring(1);
-            BankAccount account = bankAccountService.getBankAccountByAccNo(accNo);
-            if (account != null) {
-                resp.setContentType("application/json");
-                objectMapper.writeValue(resp.getOutputStream(), account);
-            } else {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Account not found");
+        try {
+            var params = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/accounts/?(\\d+)?", UserAccountParams.class);
+
+            if (params.getUserId() != null && params.getAccNo() != null) {
+                // Extract the account number from URL
+                BankAccount account = bankAccountService.getBankAccountByAccNo(params.getAccNo());
+                if (account != null) {
+                    ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account found", account);
+                } else {
+                    ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_NOT_FOUND, "Account not found", null);
+                }
+            } else if (params.getUserId() != null) {
+                System.out.println("I'm in doGet: " + params.getUserId());
+                // If no specific account, retrieve by userId
+                List<BankAccount> accounts = bankAccountService.getBankAccountsByUserId(params.getUserId());
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Accounts found", accounts);
             }
-        } else {
-            // If no specific account, retrieve by userId
-            String userIdParam = req.getParameter("userId");
-            if (userIdParam != null) {
-                long userId = Long.parseLong(userIdParam);
-                List<BankAccount> accounts = bankAccountService.getBankAccountsByUserId(userId);
-                resp.setContentType("application/json");
-                objectMapper.writeValue(resp.getOutputStream(), accounts);
-            } else {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing userId parameter");
-            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error in doGet", e);
+            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), null);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        BankAccount account = objectMapper.readValue(req.getInputStream(), BankAccount.class);
-        BankAccount result = bankAccountService.addBankAccount(account);
-        if (result != null) {
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_CREATED);
-            objectMapper.writeValue(resp.getOutputStream(), account);
-        } else {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to create account");
+        BankAccount account = HttpRequestParser.parse(req, CreateBankAccountDTO.class).toBankAccount();
+        try {
+            var params = PathParamExtractor.extractPathParams(req.getPathInfo(), "/(\\d+)/accounts", UserAccountParams.class);
+            if (params.getUserId() != null) {
+                System.out.println("I'm in doPost: " + params.getUserId());
+                account.setUserId(params.getUserId());
+                var result = CreateBankAccountDTO.fromBankAccount(bankAccountService.addBankAccount(account));
+                if (result != null) {
+                    ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_CREATED, "Account created", result);
+                } else {
+                    ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, "Account could not be created", null);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error in doPost", e);
+            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), null);
         }
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
-        if (pathInfo != null && pathInfo.length() > 1) {
-            // Extract the account number from URL
-            String accNo = pathInfo.substring(1);
-            BankAccount account = objectMapper.readValue(req.getInputStream(), BankAccount.class);
-            account.setAccNo(accNo);
-
-            BankAccount result = bankAccountService.updateBankAccount(account);
-            if (result != null) {
-                resp.setContentType("application/json");
-                resp.setStatus(HttpServletResponse.SC_OK);
-                objectMapper.writeValue(resp.getOutputStream(), account);
+        try {
+            var params = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/accounts/(\\d+)", UserAccountParams.class);
+            if (params.getUserId() != null && params.getAccNo() != null) {
+                BankAccount account = HttpRequestParser.parse(req, UpdateBankAccountDTO.class).toBankAccount();
+//                account.setUserId(params.getUserId());
+                account.setAccNo(params.getAccNo());
+                System.out.println("I'm in doPut: " + params.getUserId() + account);
+                var updatedAccount = UpdateBankAccountDTO.fromBankAccount(bankAccountService.updateBankAccount(account));
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account updated", updatedAccount);
             } else {
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update account");
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, "User ID and Account number are required for updating", null);
             }
-        } else {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Account number is required for updating");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error in doPut", e);
+            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), null);
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
-        if (pathInfo != null && pathInfo.length() > 1) {
-            // Extract the account number from URL
-            String accNo = pathInfo.substring(1);
-
-            bankAccountService.deleteBankAccount(accNo);
-            if (true) {
-                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        try {
+            var params = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/accounts/(\\d+)", UserAccountParams.class);
+            if (params.getUserId() != null && params.getAccNo() != null) {
+                BankAccount account = bankAccountService.getBankAccountByAccNo(params.getAccNo());
+                if (account != null) {
+                    bankAccountService.deleteBankAccount(params.getAccNo());
+                    ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account deleted", account);
+                } else {
+                    ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_NOT_FOUND, "Account not found", null);
+                }
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Account not found or could not be deleted");
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, "User ID and Account number are required for deletion", null);
             }
-        } else {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Account number is required for deletion");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error in doDelete", e);
+            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), null);
         }
     }
 }

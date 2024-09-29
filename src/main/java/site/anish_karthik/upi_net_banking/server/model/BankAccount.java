@@ -17,8 +17,8 @@ import site.anish_karthik.upi_net_banking.server.model.enums.AccountType;
 public class BankAccount {
     private String accNo;
     private String ifsc;
-    private long bankId;
-    private long userId;
+    private Long bankId;
+    private Long userId;
     private BigDecimal balance;
     private Timestamp createdAt;
     private AccountType accountType;

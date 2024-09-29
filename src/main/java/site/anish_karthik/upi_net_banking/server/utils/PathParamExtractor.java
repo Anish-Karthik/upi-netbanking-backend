@@ -25,11 +25,11 @@ public class PathParamExtractor {
         // If the path matches the regex, proceed to extract parameters
         if (matcher.matches()) {
             // Create an instance of the DTO class
+            System.out.println("I'm in extractPathParams" + matcher.toString());
             T paramsObject = dtoClass.getDeclaredConstructor().newInstance();
 
             // Get all fields from the DTO class
             Field[] fields = dtoClass.getDeclaredFields();
-
             // Start from group 1 (group 0 is the entire match)
             for (int i = 0; i < fields.length; i++) {
                 // Get the current field
@@ -38,16 +38,23 @@ public class PathParamExtractor {
                 field.setAccessible(true);
 
                 // Get the regex group corresponding to the field index
-                String value = matcher.group(i + 1);
-
-                // Convert and set the value to the appropriate field type
-                if (field.getType().equals(Integer.class) || field.getType().equals(int.class)) {
-                    field.set(paramsObject, Integer.parseInt(value));
-                } else if (field.getType().equals(Long.class) || field.getType().equals(long.class)) {
-                    field.set(paramsObject, Long.parseLong(value));
-                } else {
-                    // For String and other types, set the value directly
-                    field.set(paramsObject, value);
+                try {
+                    String value = matcher.group(i + 1);
+                    if (value == null) {
+                        break;
+                    }
+                    System.out.println(field + value);
+                    // Convert and set the value to the appropriate field type
+                    if (field.getType().equals(Integer.class) || field.getType().equals(int.class)) {
+                        field.set(paramsObject, Integer.parseInt(value));
+                    } else if (field.getType().equals(Long.class) || field.getType().equals(long.class)) {
+                        field.set(paramsObject, Long.parseLong(value));
+                    } else {
+                        // For String and other types, set the value directly
+                        field.set(paramsObject, value);
+                    }
+                } catch (Exception e) {
+                    break;
                 }
             }
 

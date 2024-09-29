@@ -57,7 +57,12 @@ public class QueryBuilderUtil {
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             for (int i = 0; i < params.size(); i++) {
-                stmt.setObject(i + 1, params.get(i));  // Set parameters dynamically
+                Object param = params.get(i);
+                if (param instanceof Enum<?>) {
+                    stmt.setObject(i + 1, ((Enum<?>) param).name());
+                } else {
+                    stmt.setObject(i + 1, param);  // Set parameters dynamically
+                }
             }
             stmt.executeUpdate();
         }
