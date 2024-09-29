@@ -7,8 +7,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.dto.*;
-import site.anish_karthik.upi_net_banking.server.service.UpiCardService;
-import site.anish_karthik.upi_net_banking.server.service.impl.UpiCardServiceImpl;
+import site.anish_karthik.upi_net_banking.server.service.CardService;
+import site.anish_karthik.upi_net_banking.server.service.UpiService;
+import site.anish_karthik.upi_net_banking.server.service.impl.CardServiceImpl;
+import site.anish_karthik.upi_net_banking.server.service.impl.UpiServiceImpl;
 import site.anish_karthik.upi_net_banking.server.utils.HttpRequestParser;
 import site.anish_karthik.upi_net_banking.server.utils.PathParamExtractor;
 import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
@@ -21,11 +23,12 @@ import java.util.logging.Logger;
 @WebServlet("/api/accounts/*")
 public class UpiCardController extends HttpServlet {
     public static String upiRegex = "\\S+";
-    private final UpiCardService upiCardService;
-
+    private final UpiService upiService;
+    private final CardService cardService;
     {
         try {
-            upiCardService = new UpiCardServiceImpl();
+            upiService = new UpiServiceImpl();
+            cardService = new CardServiceImpl();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -42,24 +45,24 @@ public class UpiCardController extends HttpServlet {
                 System.out.println("Get all upi path 1");
                 if (pathInfo.matches("/\\d+/upi/"+upiRegex)) {
                     String upiId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/upi/("+upiRegex+")", String.class);
-                    GetUpiDTO upi = upiCardService.getUpiById(upiId);
+                    GetUpiDTO upi = upiService.getUpiById(upiId);
                     upi.setAccNo(PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/upi/"+upiRegex, String.class));
                     ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI found", upi);
                 } else {
                     System.out.println("Get all upi by acc no");
                     String accNo = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/upi", String.class);
-                    List<GetUpiDTO> upiList = upiCardService.getUpiByAccNo(accNo);
+                    List<GetUpiDTO> upiList = upiService.getUpiByAccNo(accNo);
                     ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI found", upiList);
                 }
             } else if (pathInfo.matches("/\\d+/card.*")) {
                 if (pathInfo.matches("/\\d+/card/\\d+")) {
                     String cardNo = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/card/(\\d+)", String.class);
-                    GetCardDTO card = upiCardService.getCardByCardNo(cardNo);
+                    GetCardDTO card = cardService.getCardByCardNo(cardNo);
                     card.setAccNo(PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/card/\\d+", String.class));
                     ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card found", card);
                 } else {
                     String accNo = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/card", String.class);
-                    List<GetCardDTO> cardList = upiCardService.getCardByAccNo(accNo);
+                    List<GetCardDTO> cardList = cardService.getCardByAccNo(accNo);
                     ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card found", cardList);
                 }
             } else {
@@ -77,11 +80,11 @@ public class UpiCardController extends HttpServlet {
         try {
             if (pathInfo.matches("/\\d+/upi")) {
                 CreateUpiDTO createUpiDTO = HttpRequestParser.parse(req, CreateUpiDTO.class);
-                var res = upiCardService.createUpi(createUpiDTO);
+                var res = upiService.createUpi(createUpiDTO);
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_CREATED, "UPI created", res);
             } else if (pathInfo.matches("/\\d+/card")) {
                 CreateCardDTO createCardDTO = HttpRequestParser.parse(req, CreateCardDTO.class);
-                var res = upiCardService.createCard(createCardDTO);
+                var res = cardService.createCard(createCardDTO);
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_CREATED, "Card created", res);
             }
         } catch (Exception e) {
@@ -97,22 +100,22 @@ protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws Se
         if (pathInfo.matches("/\\d+/upi/"+upiRegex+"/pin")) {
             UpdateUpiPinDTO updateUpiPinDTO = HttpRequestParser.parse(req, UpdateUpiPinDTO.class);
             String upiId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/upi/("+upiRegex+")/pin", String.class);
-            upiCardService.updateUpiPin(updateUpiPinDTO, upiId);
+            upiService.updateUpiPin(updateUpiPinDTO, upiId);
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI PIN updated", updateUpiPinDTO);
         } else if (pathInfo.matches("/\\d+/card/\\d+/pin")) {
             UpdateCardPinDTO updateCardPinDTO = HttpRequestParser.parse(req, UpdateCardPinDTO.class);
             var cardNo = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/card/(\\d+)/pin", String.class);
-            upiCardService.updateCardPin(updateCardPinDTO, cardNo);
+            cardService.updateCardPin(updateCardPinDTO, cardNo);
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card PIN updated", updateCardPinDTO);
         } else if (pathInfo.matches("/\\d+/upi/"+upiRegex)) {
             UpdateUpiDTO updateUpiDTO = HttpRequestParser.parse(req, UpdateUpiDTO.class);
             String upiId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/upi/("+upiRegex+")", String.class);
-            var res = UpdateUpiDTO.fromUpi(upiCardService.updateUpi(updateUpiDTO, upiId));
+            var res = UpdateUpiDTO.fromUpi(upiService.updateUpi(updateUpiDTO, upiId));
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI updated", res);
         } else if (pathInfo.matches("/\\d+/card/\\d+")) {
             UpdateCardDTO updateCardDTO = HttpRequestParser.parse(req, UpdateCardDTO.class);
             String cardNo = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/card/(\\d+)", String.class);
-            var res = UpdateCardDTO.fromCard(upiCardService.updateCard(updateCardDTO, cardNo));
+            var res = UpdateCardDTO.fromCard(cardService.updateCard(updateCardDTO, cardNo));
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card updated", res);
         } else {
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid path", null);
@@ -129,11 +132,11 @@ protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws Se
         try {
             if (pathInfo.matches("/\\d+/upi/"+upiRegex)) {
                 String upiId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/upi/("+upiRegex+")", String.class);
-                var res = upiCardService.deactivateUpi(upiId);
+                var res = upiService.deactivateUpi(upiId);
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI deactivated", res);
             } else if (pathInfo.matches("/\\d+/card/\\d+")) {
                 String cardId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/card/(\\d+)", String.class);
-                var res = upiCardService.deactivateCard(cardId);
+                var res = cardService.deactivateCard(cardId);
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card deactivated", res);
             }
         } catch (Exception e) {
