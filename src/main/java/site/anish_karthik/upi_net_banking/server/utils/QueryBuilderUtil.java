@@ -15,7 +15,15 @@ import static site.anish_karthik.upi_net_banking.server.utils.QueryResult.toSnak
 
 public class QueryBuilderUtil {
 
-    // Insert Query Builder
+    /**
+     * Creates an insert query for the given object.
+     * By default, fields are excluded if they are null.
+     *
+     * @param tableName the name of the table
+     * @param obj the object to insert
+     * @return the query result containing the query string and parameters
+     * @throws IllegalAccessException if the object's fields are not accessible
+     */
     public QueryResult createInsertQuery(String tableName, Object obj) throws IllegalAccessException {
         StringBuilder columns = new StringBuilder();
         StringBuilder values = new StringBuilder();
@@ -28,11 +36,26 @@ public class QueryBuilderUtil {
         return new QueryResult(query.toString(), params);  // Return query and parameters
     }
 
-    // Update Query Builder
-    public QueryResult createUpdateQuery(String tableName, Object obj, String conditionColumn, Object conditionValue) throws IllegalAccessException {
+    /**
+     * Creates an update query for the given object.
+     * By default, fields are excluded if they are null.
+     *
+     * @param tableName the name of the table
+     * @param obj the object to update
+     * @param conditionColumn the column used for the condition
+     * @param conditionValue the value of the condition column
+     * @param ignoreConditionColumn whether to ignore the condition column
+     * @return the query result containing the query string and parameters
+     * @throws IllegalAccessException if the object's fields are not accessible
+     */
+    public QueryResult createUpdateQuery(String tableName, Object obj, String conditionColumn, Object conditionValue, boolean ignoreConditionColumn) throws IllegalAccessException {
         StringBuilder setClause = new StringBuilder();
         StringBuilder query = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
         List<Object> params = new ArrayList<>();
+
+        if (ignoreConditionColumn) {
+            ObjectManipulatorUtil.nullifyField(obj, conditionColumn);  // Nullify the condition column if ignoreConditionColumn is true
+        }
 
         buildSetClause(obj, setClause, params);
 
@@ -42,7 +65,30 @@ public class QueryBuilderUtil {
         return new QueryResult(query.toString(), params);  // Return query and parameters
     }
 
-    // Select Query Builder
+    /**
+     * Creates an update query for the given object.
+     * By default, fields are excluded if they are null.
+     *
+     * @param tableName the name of the table
+     * @param obj the object to update
+     * @param conditionColumn the column used for the condition
+     * @param conditionValue the value of the condition column
+     * @return the query result containing the query string and parameters
+     * @throws IllegalAccessException if the object's fields are not accessible
+     */
+    public QueryResult createUpdateQuery(String tableName, Object obj, String conditionColumn, Object conditionValue) throws IllegalAccessException {
+        return createUpdateQuery(tableName, obj, conditionColumn, conditionValue, true);
+    }
+
+    /**
+     * Creates a select query for the given object.
+     * By default, fields are excluded if they are null.
+     *
+     * @param tableName the name of the table
+     * @param obj the object to select
+     * @return the query result containing the query string and parameters
+     * @throws IllegalAccessException if the object's fields are not accessible
+     */
     public QueryResult createSelectQuery(String tableName, Object obj) throws IllegalAccessException {
         StringBuilder whereClause = new StringBuilder("SELECT * FROM ").append(tableName).append(" WHERE ");
         List<Object> params = new ArrayList<>();
@@ -54,7 +100,16 @@ public class QueryBuilderUtil {
         return new QueryResult(whereClause.toString(), params);  // Return query and parameters
     }
 
-    // Execute Prepared Query
+    /**
+     * Executes a dynamic query and returns the generated ID.
+     *
+     * @param connection the database connection
+     * @param queryResult the query result containing the query string and parameters
+     * @param idType the type of the generated ID
+     * @param <T> the type of the generated ID
+     * @return the generated ID
+     * @throws SQLException if a database access error occurs
+     */
     public <T> T executeDynamicQuery(Connection connection, QueryResult queryResult, Class<T> idType) throws SQLException {
         String query = queryResult.getQuery();
         List<Object> params = queryResult.getParameters();
@@ -86,6 +141,13 @@ public class QueryBuilderUtil {
         }
     }
 
+    /**
+     * Executes a dynamic query.
+     *
+     * @param connection the database connection
+     * @param queryResult the query result containing the query string and parameters
+     * @throws SQLException if a database access error occurs
+     */
     public void executeDynamicQuery(Connection connection, QueryResult queryResult) throws SQLException {
         String query = queryResult.getQuery();
         List<Object> params = queryResult.getParameters();
@@ -96,6 +158,14 @@ public class QueryBuilderUtil {
         }
     }
 
+    /**
+     * Executes a dynamic select query and returns the result set.
+     *
+     * @param connection the database connection
+     * @param queryResult the query result containing the query string and parameters
+     * @return the result set of the query
+     * @throws SQLException if a database access error occurs
+     */
     public ResultSet executeDynamicSelectQuery(Connection connection, QueryResult queryResult) throws SQLException {
         String query = queryResult.getQuery();
         List<Object> params = queryResult.getParameters();
