@@ -78,9 +78,28 @@ public class UpiServiceImpl implements UpiService {
     }
 
     @Override
-    public Upi deactivateUpi(String upiId) throws Exception {
-        Upi upi = upiDao.findById(upiId).orElseThrow(() -> new Exception("UPI not found"));
+    public Upi deactivateUpi(String upiId) throws UpiException {
+        // Fetch the UPI by its ID
+        Upi upi = upiDao.findById(upiId).orElseThrow(() -> new UpiException("UPI not found", HttpServletResponse.SC_NOT_FOUND));
+
+        // Check if the UPI is the default
+        if (upi.getIsDefault()) {
+            // Fetch all UPIs for the given account number
+            List<Upi> existingUpisForGivenAccNo = upiDao.findByAccNo(upi.getAccNo());
+
+            // Find another active UPI to set as the default
+            Upi newDefaultUpi = existingUpisForGivenAccNo.stream()
+                    .filter(u -> !u.getUpiId().equals(upiId) && u.getStatus() == UpiStatus.ACTIVE)
+                    .findFirst()
+                    .orElseThrow(() -> new UpiException("No other active UPI found to set as default", HttpServletResponse.SC_NOT_FOUND));
+
+            // Set the new default UPI
+            upiDao.update(Upi.builder().upiId(newDefaultUpi.getUpiId()).isDefault(true).build());
+        }
+
+        // Deactivate the given UPI
         upi.setStatus(UpiStatus.INACTIVE);
+        upi.setIsDefault(false);
         return upiDao.update(upi);
     }
 
