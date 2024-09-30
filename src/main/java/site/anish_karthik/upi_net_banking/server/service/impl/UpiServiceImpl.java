@@ -62,10 +62,15 @@ public class UpiServiceImpl implements UpiService {
         return GetUpiDTO.fromUpi(upi);
     }
 
-    @Override
     public Upi updateUpiStatus(UpdateUpiDTOStatus updateUpiDTO, String upiId) throws Exception {
-        Upi upi = updateUpiDTO.toUpi();
-        upi.setUpiId(upiId);
+        Upi upi = upiDao.findById(upiId).orElseThrow(() -> new Exception("UPI not found"));
+
+        // Check if the UPI is default or the new status is other than ACTIVE
+        if (upi.getIsDefault() && updateUpiDTO.getStatus() != UpiStatus.ACTIVE) {
+            throw new Exception("Cannot update the status of a default UPI or set status to active");
+        }
+
+        upi.setStatus(updateUpiDTO.getStatus());
         return upiDao.update(upi);
     }
 
