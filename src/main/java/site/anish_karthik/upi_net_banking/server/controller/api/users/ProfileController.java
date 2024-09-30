@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet("/api/users/profile/*")
+@WebServlet("/api/profile/*")
 public class ProfileController extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(ProfileController.class.getName());
     private final UserService userService;
@@ -69,7 +69,6 @@ public class ProfileController extends HttpServlet {
                 User user = userService.getUserById(userProfileParams.getUserId()).orElse(null);
                 if (user != null) {
                     GetUserProfileDTO userProfileDTO = GetUserProfileDTO.fromUser(user);
-                    resp.setContentType("application/json");
                     ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "User found", userProfileDTO);
                 } else {
                     ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_NOT_FOUND, "User not found", null);

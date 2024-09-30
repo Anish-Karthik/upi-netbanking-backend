@@ -11,7 +11,7 @@ import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 
 import java.io.IOException;
 
-@WebFilter(urlPatterns = {"/api/users/profile/*"})
+@WebFilter(urlPatterns = {"/api/profile/*"})
 public class UserProfileFilter implements Filter {
 
     @Override

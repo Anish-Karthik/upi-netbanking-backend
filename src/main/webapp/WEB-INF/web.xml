@@ -24,6 +24,6 @@
 <!--    </filter>-->
 <!--    <filter-mapping>-->
 <!--        <filter-name>UserValidationProfileFilter</filter-name>-->
-<!--        <url-pattern>/users/profile/*</url-pattern>-->
+<!--        <url-pattern>/profile/*</url-pattern>-->
 <!--    </filter-mapping>-->
 </web-app>

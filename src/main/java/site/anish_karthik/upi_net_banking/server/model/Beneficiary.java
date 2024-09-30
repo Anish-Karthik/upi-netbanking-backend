@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class Beneficiary {
-    private long id;
+    private Long id;
     private String name;
     private String accNo;
-    private long beneficiaryOfUserId;
+    private Long beneficiaryOfUserId;
     private String description;
     private String upiId;
 }
