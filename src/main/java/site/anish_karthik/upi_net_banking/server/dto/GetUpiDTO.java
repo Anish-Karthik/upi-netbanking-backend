@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
+import site.anish_karthik.upi_net_banking.server.model.enums.UpiStatus;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,12 +15,16 @@ public class GetUpiDTO {
     private String upiId;
     private Long userId;
     private String accNo;
+    private UpiStatus status;
+    private Boolean isDefault;
 
     public static GetUpiDTO fromUpi(Upi upi) {
         return GetUpiDTO.builder()
                 .upiId(upi.getUpiId())
                 .userId(upi.getUserId())
                 .accNo(upi.getAccNo())
+                .status(upi.getStatus())
+                .isDefault(upi.getIsDefault())
                 .build();
     }
 
@@ -28,6 +33,8 @@ public class GetUpiDTO {
                 .upiId(upiId)
                 .userId(userId)
                 .accNo(accNo)
+                .status(status)
+                .isDefault(isDefault)
                 .build();
     }
 }

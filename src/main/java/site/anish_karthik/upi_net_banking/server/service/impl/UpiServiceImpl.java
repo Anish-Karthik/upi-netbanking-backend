@@ -1,10 +1,12 @@
 // UpiCardServiceImpl.java
 package site.anish_karthik.upi_net_banking.server.service.impl;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.mindrot.jbcrypt.BCrypt;
 import site.anish_karthik.upi_net_banking.server.dao.UserDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.UserDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dto.*;
+import site.anish_karthik.upi_net_banking.server.exception.UpiException;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
 import site.anish_karthik.upi_net_banking.server.model.User;
 import site.anish_karthik.upi_net_banking.server.model.enums.UpiStatus;
@@ -61,7 +63,7 @@ public class UpiServiceImpl implements UpiService {
     }
 
     @Override
-    public Upi updateUpi(UpdateUpiDTO updateUpiDTO, String upiId) throws Exception {
+    public Upi updateUpiStatus(UpdateUpiDTOStatus updateUpiDTO, String upiId) throws Exception {
         Upi upi = updateUpiDTO.toUpi();
         upi.setUpiId(upiId);
         return upiDao.update(upi);
@@ -80,6 +82,49 @@ public class UpiServiceImpl implements UpiService {
         Upi upi = upiDao.findById(upiId).orElseThrow(() -> new Exception("UPI not found"));
         upi.setStatus(UpiStatus.INACTIVE);
         return upiDao.update(upi);
+    }
+
+    @Override
+    public Upi changeDefaultUpi(UpdateUpiDTODefault updateUpiDTODefault, String upiId, String accNo) throws UpiException {
+        // Fetch all UPIs for the given account number
+        List<Upi> existingUpisForGivenAccNo = upiDao.findByAccNo(accNo);
+        System.out.println(upiId + " " +existingUpisForGivenAccNo);
+        // Filter to find the UPI with the given ID
+        Upi upi = existingUpisForGivenAccNo.stream()
+                .filter(u -> u.getUpiId().equals(upiId) && u.getStatus() == UpiStatus.ACTIVE)
+                .findFirst()
+                .orElseThrow(() -> new UpiException("Active UPI not found", HttpServletResponse.SC_NOT_FOUND));
+
+        // Check if the existing status and new status are the same
+        if (upi.getIsDefault() == updateUpiDTODefault.getIsDefault()) {
+            throw new UpiException("The existing status and new status are the same", HttpServletResponse.SC_BAD_REQUEST);
+        }
+
+        // If new status is true, make this UPI default and set the existing default UPI to false
+        if (updateUpiDTODefault.getIsDefault()) {
+            Upi existingDefaultUpi = existingUpisForGivenAccNo.stream()
+                    .filter(Upi::getIsDefault)
+                    .findFirst()
+                    .orElseThrow(() -> new UpiException("Default UPI not found", HttpServletResponse.SC_NOT_FOUND));
+            upiDao.update(Upi.builder().upiId(existingDefaultUpi.getUpiId()).isDefault(false).build());
+        } else {
+            // If this is the only UPI for the account and new status is false, throw an exception
+            if (existingUpisForGivenAccNo.size() == 1) {
+                throw new UpiException("Cannot set the only UPI to non-default", HttpServletResponse.SC_BAD_REQUEST);
+            }
+
+            // Set a random (preferably the first) UPI as default
+            Upi newDefaultUpi = existingUpisForGivenAccNo.stream()
+                    .filter(u -> !u.getUpiId().equals(upiId) && u.getStatus() == UpiStatus.ACTIVE)
+                    .findFirst()
+                    .orElseThrow(() -> new UpiException("No other active UPI found to set as default", HttpServletResponse.SC_NOT_FOUND));
+            upiDao.update(Upi.builder().upiId(newDefaultUpi.getUpiId()).isDefault(true).build());
+        }
+
+        // Update the given UPI's default status
+        upiDao.update(Upi.builder().upiId(upiId).isDefault(updateUpiDTODefault.getIsDefault()).build());
+        upi.setIsDefault(updateUpiDTODefault.getIsDefault());
+        return upi;
     }
 
     private Boolean determineIsDefault(List<Upi> existingUpisForGivenAccNo) {

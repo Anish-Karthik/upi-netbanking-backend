@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.dto.*;
+import site.anish_karthik.upi_net_banking.server.exception.UpiException;
 import site.anish_karthik.upi_net_banking.server.service.CardService;
 import site.anish_karthik.upi_net_banking.server.service.UpiService;
 import site.anish_karthik.upi_net_banking.server.service.impl.CardServiceImpl;
@@ -93,38 +94,47 @@ public class UpiCardController extends HttpServlet {
         }
     }
 
-   @Override
-protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    String pathInfo = req.getPathInfo();
-    try {
-        if (pathInfo.matches("/\\d+/upi/"+upiRegex+"/pin")) {
-            UpdateUpiPinDTO updateUpiPinDTO = HttpRequestParser.parse(req, UpdateUpiPinDTO.class);
-            String upiId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/upi/("+upiRegex+")/pin", String.class);
-            upiService.updateUpiPin(updateUpiPinDTO, upiId);
-            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI PIN updated", updateUpiPinDTO);
-        } else if (pathInfo.matches("/\\d+/card/\\d+/pin")) {
-            UpdateCardPinDTO updateCardPinDTO = HttpRequestParser.parse(req, UpdateCardPinDTO.class);
-            var cardNo = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/card/(\\d+)/pin", String.class);
-            cardService.updateCardPin(updateCardPinDTO, cardNo);
-            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card PIN updated", updateCardPinDTO);
-        } else if (pathInfo.matches("/\\d+/upi/"+upiRegex)) {
-            UpdateUpiDTO updateUpiDTO = HttpRequestParser.parse(req, UpdateUpiDTO.class);
-            String upiId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/upi/("+upiRegex+")", String.class);
-            var res = UpdateUpiDTO.fromUpi(upiService.updateUpi(updateUpiDTO, upiId));
-            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI updated", res);
-        } else if (pathInfo.matches("/\\d+/card/\\d+")) {
-            UpdateCardDTO updateCardDTO = HttpRequestParser.parse(req, UpdateCardDTO.class);
-            String cardNo = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/card/(\\d+)", String.class);
-            var res = UpdateCardDTO.fromCard(cardService.updateCard(updateCardDTO, cardNo));
-            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card updated", res);
-        } else {
-            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid path", null);
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo();
+        try {
+            if (pathInfo.matches("/\\d+/upi/"+upiRegex+"/pin")) {
+                UpdateUpiPinDTO updateUpiPinDTO = HttpRequestParser.parse(req, UpdateUpiPinDTO.class);
+                String upiId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/upi/("+upiRegex+")/pin", String.class);
+                upiService.updateUpiPin(updateUpiPinDTO, upiId);
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI PIN updated", updateUpiPinDTO);
+            } else if (pathInfo.matches("/\\d+/card/\\d+/pin")) {
+                UpdateCardPinDTO updateCardPinDTO = HttpRequestParser.parse(req, UpdateCardPinDTO.class);
+                var cardNo = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/card/(\\d+)/pin", String.class);
+                cardService.updateCardPin(updateCardPinDTO, cardNo);
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card PIN updated", updateCardPinDTO);
+            } else if (pathInfo.matches("/\\d+/upi/"+upiRegex+"/status")) {
+                UpdateUpiDTOStatus updateUpiDTOStatus = HttpRequestParser.parse(req, UpdateUpiDTOStatus.class);
+                String upiId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/upi/("+upiRegex+")/status", String.class);
+                var res = UpdateUpiDTOStatus.fromUpi(upiService.updateUpiStatus(updateUpiDTOStatus, upiId));
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI status updated", res);
+            } else if (pathInfo.matches("/\\d+/upi/"+upiRegex+"/default")) {
+                UpdateUpiDTODefault updateUpiDTODefault = HttpRequestParser.parse(req, UpdateUpiDTODefault.class);
+                String upiId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/upi/("+upiRegex+")/default", String.class);
+                String accNo = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/upi/"+upiRegex+"/default", String.class);
+                var res = UpdateUpiDTODefault.fromUpi(upiService.changeDefaultUpi(updateUpiDTODefault, upiId, accNo));
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI default status updated", res);
+            } else if (pathInfo.matches("/\\d+/card/\\d+")) {
+                UpdateCardDTO updateCardDTO = HttpRequestParser.parse(req, UpdateCardDTO.class);
+                String cardNo = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/card/(\\d+)", String.class);
+                var res = UpdateCardDTO.fromCard(cardService.updateCard(updateCardDTO, cardNo));
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card updated", res);
+            } else {
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid path", null);
+            }
+        } catch (UpiException e) {
+            LOGGER.log(Level.FINE, "Error in doPut", e);
+            ResponseUtil.sendResponse(req, resp, e.getStatusCode(), e.getMessage(), null);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error in doPut", e);
+            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), null);
         }
-    } catch (Exception e) {
-        LOGGER.log(Level.SEVERE, "Error in doPut", e);
-        ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), null);
     }
-}
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -139,6 +149,9 @@ protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws Se
                 var res = cardService.deactivateCard(cardId);
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card deactivated", res);
             }
+        } catch (UpiException e) {
+            LOGGER.log(Level.SEVERE, "Error in doDelete", e);
+            ResponseUtil.sendResponse(req, resp, e.getStatusCode(), e.getMessage(), null);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error in doDelete", e);
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), null);

@@ -11,8 +11,9 @@ public interface UpiService {
     Upi createUpi(CreateUpiDTO createUpiDTO) throws Exception;
     List<GetUpiDTO> getUpiByAccNo(String accNo) throws Exception;
     GetUpiDTO getUpiById(String upiId) throws Exception;
-    Upi updateUpi(UpdateUpiDTO updateUpiDTO, String upiId) throws Exception;
+    Upi updateUpiStatus(UpdateUpiDTOStatus updateUpiDTO, String upiId) throws Exception;
     Upi updateUpiPin(UpdateUpiPinDTO updateUpiPinDTO, String upiId) throws Exception;
     Upi deactivateUpi(String upiId) throws Exception;
+    Upi changeDefaultUpi(UpdateUpiDTODefault updateUpiDTODefault, String upiId, String acc) throws Exception;
 }
 

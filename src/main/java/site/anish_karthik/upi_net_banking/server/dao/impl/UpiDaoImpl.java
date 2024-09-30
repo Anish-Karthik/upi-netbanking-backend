@@ -4,6 +4,7 @@ import site.anish_karthik.upi_net_banking.server.dao.UpiDao;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
+import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class UpiDaoImpl implements UpiDao {
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToUpi(rs));
+                return Optional.of(ResultSetMapper.mapResultSetToObject(rs, Upi.class));
             }
             return Optional.empty();
         } catch (SQLException e) {
@@ -51,7 +52,7 @@ public class UpiDaoImpl implements UpiDao {
                 ResultSet rs = stmt.executeQuery()) {
             List<Upi> upis = new ArrayList<>();
             while (rs.next()) {
-                upis.add(mapResultSetToUpi(rs));
+                upis.add(ResultSetMapper.mapResultSetToObject(rs, Upi.class));
             }
             return upis;
         } catch (SQLException e) {
@@ -89,7 +90,7 @@ public class UpiDaoImpl implements UpiDao {
             ResultSet rs = stmt.executeQuery();
             List<Upi> upis = new ArrayList<>();
             while (rs.next()) {
-                upis.add(mapResultSetToUpi(rs));
+                upis.add(ResultSetMapper.mapResultSetToObject(rs, Upi.class));
             }
             return upis;
         } catch (SQLException e) {
@@ -106,7 +107,7 @@ public class UpiDaoImpl implements UpiDao {
             ResultSet rs = stmt.executeQuery();
             List<Upi> upis = new ArrayList<>();
             while (rs.next()) {
-                upis.add(mapResultSetToUpi(rs));
+                upis.add(ResultSetMapper.mapResultSetToObject(rs, Upi.class));
             }
             return upis;
         } catch (SQLException e) {
@@ -114,12 +115,4 @@ public class UpiDaoImpl implements UpiDao {
         }
     }
 
-    private Upi mapResultSetToUpi(ResultSet rs) throws SQLException {
-        Upi upi = new Upi();
-        upi.setUserId(rs.getLong("user_id"));
-        upi.setUpiId(rs.getString("upi_id"));
-        upi.setUpiPinHashed(rs.getString("upi_pin_hashed"));
-        upi.setIsDefault(rs.getBoolean("is_default"));
-        return upi;
-    }
 }
