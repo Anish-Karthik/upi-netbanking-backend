@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Permission {
-    private long id;
+    private Long id;
     private String accNo;
     private String upiId;
     private String cardNo;
