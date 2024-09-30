@@ -13,7 +13,7 @@ public interface UpiService {
     GetUpiDTO getUpiById(String upiId) throws Exception;
     Upi updateUpiStatus(UpdateUpiDTOStatus updateUpiDTO, String upiId) throws Exception;
     Upi updateUpiPin(UpdateUpiPinDTO updateUpiPinDTO, String upiId) throws Exception;
-    Upi deactivateUpi(String upiId) throws Exception;
+    Upi deactivateUpi(String upiId, String accNo) throws Exception;
     Upi changeDefaultUpi(UpdateUpiDTODefault updateUpiDTODefault, String upiId, String acc) throws Exception;
 }
 

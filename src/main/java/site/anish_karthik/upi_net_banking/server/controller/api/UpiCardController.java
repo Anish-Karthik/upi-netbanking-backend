@@ -140,9 +140,10 @@ public class UpiCardController extends HttpServlet {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
         try {
+            String accNo = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/.*", String.class);
             if (pathInfo.matches("/\\d+/upi/"+upiRegex)) {
                 String upiId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/upi/("+upiRegex+")", String.class);
-                var res = upiService.deactivateUpi(upiId);
+                var res = upiService.deactivateUpi(upiId, accNo);
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI deactivated", res);
             } else if (pathInfo.matches("/\\d+/card/\\d+")) {
                 String cardId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/card/(\\d+)", String.class);
