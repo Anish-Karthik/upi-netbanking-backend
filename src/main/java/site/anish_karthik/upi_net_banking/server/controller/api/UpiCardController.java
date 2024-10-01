@@ -143,11 +143,11 @@ public class UpiCardController extends HttpServlet {
             String accNo = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/.*", String.class);
             if (pathInfo.matches("/\\d+/upi/"+upiRegex)) {
                 String upiId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/upi/("+upiRegex+")", String.class);
-                var res = upiService.deactivateUpi(upiId, accNo);
+                var res = upiService.deactivate(upiId, accNo);
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "UPI deactivated", res);
             } else if (pathInfo.matches("/\\d+/card/\\d+")) {
                 String cardId = PathParamExtractor.extractPathParams(pathInfo, "/\\d+/card/(\\d+)", String.class);
-                var res = cardService.deactivateCard(cardId);
+                var res = cardService.deactivate(cardId, accNo);
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card deactivated", res);
             }
         } catch (UpiException e) {

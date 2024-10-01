@@ -7,4 +7,5 @@ import java.util.List;
 public interface CardDao extends GenericDao<Card, String> {
     List<Card> findByAccNo(String accNo);
     List<Card> findByUserId(Long userId);
+    void updateManyByAccNo(Card card, String accNo);
 }

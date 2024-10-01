@@ -120,15 +120,9 @@ public class BankAccountController extends HttpServlet {
         try {
             var params = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/accounts/(\\d+)", UserAccountParams.class);
             if (params.getUserId() != null && params.getAccNo() != null) {
-                var account = bankAccountService.getBankAccountByAccNo(params.getAccNo());
-                if (account != null) {
-                    account.setStatus(AccountStatus.CLOSED);
-                    bankAccountService.updateBankAccount(account);
-                    account.setAccNo(params.getAccNo());
-                    ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account closed", account);
-                } else {
-                    ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_NOT_FOUND, "Account not found", null);
-                }
+                bankAccountService.deleteBankAccount(params.getAccNo());
+                var account = bankAccountService.getBankAccountWithBankByAccNo(params.getAccNo());
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account closed", account);
             } else {
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, "User ID and Account number are required for deletion", null);
             }

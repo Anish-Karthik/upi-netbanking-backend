@@ -2,10 +2,9 @@ package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.CardDao;
 import site.anish_karthik.upi_net_banking.server.model.Card;
-import site.anish_karthik.upi_net_banking.server.model.enums.CardCategory;
-import site.anish_karthik.upi_net_banking.server.model.enums.CardStatus;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
+import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public class CardDaoImpl implements CardDao {
                 ResultSet rs = stmt.executeQuery()) {
             List<Card> cards = new ArrayList<>();
             while (rs.next()) {
-                cards.add(mapResultSetToCard(rs));
+                cards.add(ResultSetMapper.mapResultSetToObject(rs, Card.class));
             }
             return cards;
         } catch (SQLException e) {
@@ -96,7 +95,7 @@ public class CardDaoImpl implements CardDao {
             ResultSet rs = stmt.executeQuery();
             List<Card> cards = new ArrayList<>();
             while (rs.next()) {
-                cards.add(mapResultSetToCard(rs));
+                cards.add(ResultSetMapper.mapResultSetToObject(rs, Card.class));
             }
             return cards;
         } catch (SQLException e) {
@@ -113,7 +112,7 @@ public class CardDaoImpl implements CardDao {
             }
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToCard(rs));
+                return Optional.of(ResultSetMapper.mapResultSetToObject(rs, Card.class));
             }
             return Optional.empty();
         } catch (SQLException e) {
@@ -121,16 +120,17 @@ public class CardDaoImpl implements CardDao {
         }
     }
 
-    private Card mapResultSetToCard(ResultSet rs) throws SQLException {
-        Card card = new Card();
-        card.setUserId(rs.getLong("user_id"));
-        card.setCardNo(rs.getString("card_no"));
-        card.setCardCategory(CardCategory.valueOf(rs.getString("card_category")));
-        card.setStatus(CardStatus.valueOf(rs.getString("status")));
-        card.setAtmPinHashed(rs.getString("atm_pin_hashed"));
-        card.setCvvHashed(rs.getString("cvv_hashed"));
-        card.setValidFrom(Date.valueOf(rs.getDate("valid_from").toLocalDate()));
-        card.setValidTill(Date.valueOf(rs.getDate("valid_till").toLocalDate()));
-        return card;
+    @Override
+    public void updateManyByAccNo(Card card, String accNo) {
+        try {
+            System.out.printf("Card::: Updating cards for account %s\n", accNo);
+            QueryResult queryResult = queryBuilderUtil.createUpdateQuery("card", card, "acc_no", accNo);
+            System.out.println("Card::: Executing query:"+ queryResult);
+            queryBuilderUtil.executeDynamicQuery(connection, queryResult);
+            System.out.println("Cards updated");
+        } catch (IllegalAccessException | SQLException e) {
+            System.out.printf("Error updating cards for account %s\n", accNo);
+            throw new RuntimeException(e);
+        }
     }
 }

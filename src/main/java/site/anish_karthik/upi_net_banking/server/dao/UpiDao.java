@@ -7,4 +7,5 @@ import java.util.List;
 public interface UpiDao extends GenericDao<Upi, String> {
     List<Upi> findByUserId(Long userId);
     List<Upi> findByAccNo(String accNo);
+    void updateManyByAccNo(Upi upi, String accNo);
 }

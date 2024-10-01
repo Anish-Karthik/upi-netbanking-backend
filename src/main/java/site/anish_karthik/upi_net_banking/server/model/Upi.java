@@ -10,7 +10,7 @@ import site.anish_karthik.upi_net_banking.server.model.enums.UpiStatus;
 @AllArgsConstructor
 @Builder
 @Data
-public class Upi {
+public class Upi implements PaymentMethod {
     private String upiId;
     private String accNo;
     private String upiPinHashed;

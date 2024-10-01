@@ -84,33 +84,43 @@ public class UpiDaoImpl implements UpiDao {
 
     @Override
     public List<Upi> findByUserId(Long userId) {
-        String sql = "SELECT * FROM upi WHERE user_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, userId);
-            ResultSet rs = stmt.executeQuery();
+        try {
+            QueryResult queryResult = queryBuilderUtil.createSelectQuery("upi", Upi.builder().userId(userId).build());
+            ResultSet rs = queryBuilderUtil.executeDynamicSelectQuery(connection, queryResult);
             List<Upi> upis = new ArrayList<>();
             while (rs.next()) {
                 upis.add(ResultSetMapper.mapResultSetToObject(rs, Upi.class));
             }
             return upis;
-        } catch (SQLException e) {
+        } catch (SQLException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public List<Upi> findByAccNo(String accNo) {
-        System.out.println("accNo = " + accNo);
-        String sql = "SELECT * FROM upi WHERE acc_no = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, accNo);
-            ResultSet rs = stmt.executeQuery();
+        try {
+            QueryResult queryResult = queryBuilderUtil.createSelectQuery("upi", Upi.builder().accNo(accNo).build());
+            ResultSet rs = queryBuilderUtil.executeDynamicSelectQuery(connection, queryResult);
             List<Upi> upis = new ArrayList<>();
             while (rs.next()) {
                 upis.add(ResultSetMapper.mapResultSetToObject(rs, Upi.class));
             }
             return upis;
-        } catch (SQLException e) {
+        } catch (SQLException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void updateManyByAccNo(Upi upi, String accNo) {
+        try {
+            QueryResult queryResult = queryBuilderUtil.createUpdateQuery("upi", upi, "acc_no", accNo);
+            System.out.printf("UPI:::Executing query: %s\n", queryResult);
+            queryBuilderUtil.executeDynamicQuery(connection, queryResult);
+            System.out.println("UPI:::Executed query");
+        } catch (IllegalAccessException | SQLException e) {
+            System.out.printf("UPI:::Exception: %s\n", e);
             throw new RuntimeException(e);
         }
     }

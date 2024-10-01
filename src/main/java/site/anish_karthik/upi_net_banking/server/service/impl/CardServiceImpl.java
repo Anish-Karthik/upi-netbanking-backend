@@ -3,11 +3,9 @@ package site.anish_karthik.upi_net_banking.server.service.impl;
 import org.mindrot.jbcrypt.BCrypt;
 import site.anish_karthik.upi_net_banking.server.dao.CardDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.CardDaoImpl;
-import site.anish_karthik.upi_net_banking.server.dto.CreateCardDTO;
-import site.anish_karthik.upi_net_banking.server.dto.GetCardDTO;
-import site.anish_karthik.upi_net_banking.server.dto.UpdateCardDTO;
-import site.anish_karthik.upi_net_banking.server.dto.UpdateCardPinDTO;
+import site.anish_karthik.upi_net_banking.server.dto.*;
 import site.anish_karthik.upi_net_banking.server.model.Card;
+import site.anish_karthik.upi_net_banking.server.model.PaymentMethod;
 import site.anish_karthik.upi_net_banking.server.model.enums.CardStatus;
 import site.anish_karthik.upi_net_banking.server.service.CardService;
 import site.anish_karthik.upi_net_banking.server.utils.CardUtil;
@@ -23,7 +21,7 @@ public  class CardServiceImpl implements CardService {
         this.cardDao = new CardDaoImpl(DatabaseUtil.getConnection());
     }
     @Override
-    public Card createCard(CreateCardDTO createCardDTO) throws Exception {
+    public Card createCard(CreateCardDTO createCardDTO) {
         Card card = Card.builder()
                 .cardNo(CardUtil.generateCardNo())
                 .accNo(createCardDTO.getAccNo())
@@ -40,7 +38,7 @@ public  class CardServiceImpl implements CardService {
     }
 
     @Override
-    public List<GetCardDTO> getCardByAccNo(String accNo) throws Exception {
+    public List<GetCardDTO> getCardByAccNo(String accNo) {
         List<Card> cards = cardDao.findByAccNo(accNo);
         return cards.stream()
                 .map(card -> {
@@ -58,14 +56,14 @@ public  class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Card updateCard(UpdateCardDTO updateCardDTO, String cardNo) throws Exception {
+    public Card updateCard(UpdateCardDTO updateCardDTO, String cardNo) {
         Card card = updateCardDTO.toCard();
         card.setCardNo(cardNo);
         return cardDao.update(card);
     }
 
     @Override
-    public Card updateCardPin(UpdateCardPinDTO updateCardPinDTO, String cardNo) throws Exception {
+    public Card updateCardPin(UpdateCardPinDTO updateCardPinDTO, String cardNo) {
         Card card = updateCardPinDTO.toCard();
         card.setAtmPinHashed(BCrypt.hashpw(updateCardPinDTO.getAtmPin().toString(), BCrypt.gensalt()));
         card.setCardNo(cardNo);
@@ -73,10 +71,16 @@ public  class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Card deactivateCard(String cardNo) throws Exception {
+    public Card deactivate(String cardNo, String accNo) throws Exception {
         Card card = cardDao.findById(cardNo).orElseThrow(() -> new Exception("Card not found"));
-        card.setStatus(CardStatus.INACTIVE);
+        card.setStatus(CardStatus.CLOSED);
         return cardDao.update(card);
     }
 
+    @Override
+    public List<PaymentMethod> deactivateByAccNo(String accNo) {
+        System.out.println("Deactivating cards: ");
+        cardDao.updateManyByAccNo(Card.builder().accNo(accNo).status(CardStatus.CLOSED).build(), accNo);
+        return cardDao.findByAccNo(accNo).stream().map(card -> (PaymentMethod) card).toList();
+    }
 }

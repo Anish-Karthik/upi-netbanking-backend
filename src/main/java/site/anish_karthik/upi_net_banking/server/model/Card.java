@@ -14,7 +14,7 @@ import site.anish_karthik.upi_net_banking.server.model.enums.CardType;
 @AllArgsConstructor
 @Builder
 @Data
-public class Card {
+public class Card implements PaymentMethod {
     private String cardNo;
     private String accNo;
     private String cvvHashed;

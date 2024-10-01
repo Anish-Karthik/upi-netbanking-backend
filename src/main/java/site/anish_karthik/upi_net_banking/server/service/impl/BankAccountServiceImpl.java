@@ -5,7 +5,9 @@ import site.anish_karthik.upi_net_banking.server.dao.BankAccountDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.BankAccountDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dto.GetBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
+import site.anish_karthik.upi_net_banking.server.model.enums.AccountStatus;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
+import site.anish_karthik.upi_net_banking.server.service.PaymentMethodService;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 
 import java.sql.SQLException;
@@ -14,8 +16,15 @@ import java.util.List;
 public class BankAccountServiceImpl implements BankAccountService {
 
     private final BankAccountDao bankAccountDao = new BankAccountDaoImpl(DatabaseUtil.getConnection());
+    private final List<PaymentMethodService> paymentMethodServices;
 
     public BankAccountServiceImpl() throws SQLException, ClassNotFoundException {
+        try {
+            this.paymentMethodServices = List.of(new CardServiceImpl(), new UpiServiceImpl());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -50,6 +59,15 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public void deleteBankAccount(String accNo) {
-        bankAccountDao.delete(accNo);
+        System.out.println("Deleting account: " + accNo);
+        bankAccountDao.update(BankAccount.builder().accNo(accNo).status(AccountStatus.CLOSED).build());
+        // deactivate all payment methods associated with this account
+        paymentMethodServices.forEach(paymentMethodService -> {
+            try {
+                paymentMethodService.deactivateByAccNo(accNo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

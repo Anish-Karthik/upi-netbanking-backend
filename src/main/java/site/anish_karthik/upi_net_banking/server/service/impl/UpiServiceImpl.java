@@ -3,32 +3,34 @@ package site.anish_karthik.upi_net_banking.server.service.impl;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.mindrot.jbcrypt.BCrypt;
+import site.anish_karthik.upi_net_banking.server.dao.BankAccountDao;
 import site.anish_karthik.upi_net_banking.server.dao.UserDao;
+import site.anish_karthik.upi_net_banking.server.dao.impl.BankAccountDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dao.impl.UserDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dto.*;
 import site.anish_karthik.upi_net_banking.server.exception.UpiException;
+import site.anish_karthik.upi_net_banking.server.model.PaymentMethod;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
 import site.anish_karthik.upi_net_banking.server.model.User;
 import site.anish_karthik.upi_net_banking.server.model.enums.UpiStatus;
 import site.anish_karthik.upi_net_banking.server.dao.UpiDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.UpiDaoImpl;
-import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.UpiService;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.UpiUtil;
 
 import java.util.List;
-import java.util.Optional;
 
 public class UpiServiceImpl implements UpiService {
 
     private final UpiDao upiDao;
     private final UserDao userDao;
-    private final BankAccountService accountService = new BankAccountServiceImpl();
+    private final BankAccountDao accountDao;
 
     public UpiServiceImpl() throws Exception {
         this.upiDao = new UpiDaoImpl(DatabaseUtil.getConnection());
         this.userDao = new UserDaoImpl(DatabaseUtil.getConnection());
+        this.accountDao = new BankAccountDaoImpl(DatabaseUtil.getConnection());
     }
 
     @Override
@@ -48,7 +50,7 @@ public class UpiServiceImpl implements UpiService {
     }
 
     @Override
-    public List<GetUpiDTO> getUpiByAccNo(String accNo) throws Exception {
+    public List<GetUpiDTO> getUpiByAccNo(String accNo){
         List<Upi> upis = upiDao.findByAccNo(accNo);
         return upis.stream()
                 .map(upi -> {
@@ -78,7 +80,7 @@ public class UpiServiceImpl implements UpiService {
     }
 
     @Override
-    public Upi updateUpiPin(UpdateUpiPinDTO updateUpiPinDTO, String upiId) throws Exception {
+    public Upi updateUpiPin(UpdateUpiPinDTO updateUpiPinDTO, String upiId) {
         Upi upi = updateUpiPinDTO.toUpi();
         upi.setUpiPinHashed(BCrypt.hashpw(updateUpiPinDTO.getUpiPin().toString(), BCrypt.gensalt()));
         upi.setUpiId(upiId);
@@ -86,15 +88,14 @@ public class UpiServiceImpl implements UpiService {
     }
 
     @Override
-    public Upi deactivateUpi(String upiId, String accNo) throws UpiException {
+    public Upi deactivate(String upiId, String accNo) throws UpiException {
         // Fetch the UPI by its ID
         Upi upi = upiDao.findById(upiId)
                 .orElseThrow(() -> new UpiException("UPI not found", HttpServletResponse.SC_NOT_FOUND));
 
         // Fetch the account status
         AccountStatusDTO accountStatusDTO = AccountStatusDTO
-                .fromBankAccount((Optional.of(accountService.getBankAccountByAccNo(accNo)))
-                        .orElseThrow(() -> new UpiException("Account not found", HttpServletResponse.SC_NOT_FOUND)));
+                .fromBankAccount(accountDao.findById(accNo).orElseThrow(() -> new UpiException("Account not found", HttpServletResponse.SC_NOT_FOUND)));
 
         // Allow deactivation if the account is closed
         if ("CLOSED".equalsIgnoreCase(accountStatusDTO.getStatus().name())) {
@@ -120,9 +121,15 @@ public class UpiServiceImpl implements UpiService {
         }
 
         // Deactivate the given UPI
-        upi.setStatus(UpiStatus.INACTIVE);
+        upi.setStatus(UpiStatus.CLOSED);
         upi.setIsDefault(false);
         return upiDao.update(upi);
+    }
+
+    @Override
+    public List<PaymentMethod> deactivateByAccNo(String accNo) {
+        upiDao.updateManyByAccNo(Upi.builder().accNo(accNo).status(UpiStatus.CLOSED).build(), accNo);
+        return upiDao.findByAccNo(accNo).stream().map(upi ->  (PaymentMethod) upi).toList();
     }
 
     @Override
