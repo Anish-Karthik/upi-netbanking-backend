@@ -3,6 +3,8 @@ package site.anish_karthik.upi_net_banking.server.controller.auth;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
+
 import java.io.IOException;
 
 @WebServlet("/auth/logout")
@@ -23,6 +25,6 @@ public class LogoutServlet extends HttpServlet {
         sessionCookie.setMaxAge(0);
 
         resp.addCookie(sessionCookie);
-        resp.getWriter().write("Logout successful");
+        ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Logout successful", null);
     }
 }

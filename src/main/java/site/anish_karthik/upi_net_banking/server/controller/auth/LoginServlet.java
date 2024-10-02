@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.HttpRequestParser;
+import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -30,8 +31,7 @@ public class LoginServlet extends HttpServlet {
         Optional<User> userOpt = authService.loginUser(user);
 
         if (userOpt.isEmpty()) {
-            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            resp.getWriter().write("Invalid email/phone or password");
+            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials", null);
             return;
         }
 
@@ -47,6 +47,6 @@ public class LoginServlet extends HttpServlet {
         sessionCookie.setMaxAge(30 * 60); // 30 minutes expiration
 
         resp.addCookie(sessionCookie);
-        resp.getWriter().write("Login successful" + user);
+        ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Login successful", userOpt.get());
     }
 }

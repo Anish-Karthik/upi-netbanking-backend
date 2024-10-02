@@ -10,6 +10,7 @@ import jakarta.servlet.http.*;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.HttpRequestParser;
 import site.anish_karthik.upi_net_banking.server.utils.JsonParser;
+import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,16 +32,12 @@ public class RegisterServlet extends HttpServlet {
         try {
             Optional<User> registeredUser = authService.registerUser(user);
             if (registeredUser.isPresent()) {
-                resp.setStatus(HttpServletResponse.SC_OK);
-                resp.getWriter().write("User: " + user);
-                resp.getWriter().write("\nRegistration successful");
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Registration successful", registeredUser.get());
             } else {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().write("Registration failed");
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, "User already exists", null);
             }
         } catch (RuntimeException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write(e.getMessage());
+            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), null);
         }
     }
 
