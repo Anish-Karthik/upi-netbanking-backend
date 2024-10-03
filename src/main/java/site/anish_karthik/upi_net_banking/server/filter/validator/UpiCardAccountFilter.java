@@ -15,7 +15,6 @@ import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebFilter(urlPatterns = {"/api/accounts/*"})
 public class UpiCardAccountFilter implements Filter {
     private final static BankAccountService accountService;
     static {

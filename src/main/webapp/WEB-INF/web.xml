@@ -3,27 +3,53 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
-<!--    <session-config>-->
-<!--        <session-timeout>30</session-timeout>  &lt;!&ndash; Session timeout in minutes &ndash;&gt;-->
-<!--        <cookie-config>-->
-<!--            <http-only>true</http-only>        &lt;!&ndash; Enforces HttpOnly cookie &ndash;&gt;-->
-<!--            <secure>true</secure>              &lt;!&ndash; Enforces HTTPS only &ndash;&gt;-->
-<!--        </cookie-config>-->
-<!--    </session-config>-->
-<!--    <filter>-->
-<!--        <filter-name>AuthenticationFilter</filter-name>-->
-<!--        <filter-class>site.anish_karthik.upi_net_banking.server.filter.AuthenticationFilter</filter-class>-->
-<!--    </filter>-->
-<!--    <filter-mapping>-->
-<!--        <filter-name>AuthenticationFilter</filter-name>-->
-<!--        <url-pattern>/api/*</url-pattern>-->
-<!--    </filter-mapping>-->
-<!--    <filter>-->
-<!--        <filter-name>UserValidationProfileFilter</filter-name>-->
-<!--        <filter-class>site.anish_karthik.upi_net_banking.server.filter.validator.UserProfileFilter</filter-class>-->
-<!--    </filter>-->
-<!--    <filter-mapping>-->
-<!--        <filter-name>UserValidationProfileFilter</filter-name>-->
-<!--        <url-pattern>/profile/*</url-pattern>-->
-<!--    </filter-mapping>-->
+    <session-config>
+        <session-timeout>30</session-timeout>  <!-- Session timeout in minutes -->
+        <cookie-config>
+            <http-only>true</http-only>        <!-- Enforces HttpOnly cookie -->
+            <secure>true</secure>              <!-- Enforces HTTPS only -->
+        </cookie-config>
+    </session-config>
+    <filter>
+        <filter-name>CORSInterceptor</filter-name>
+        <filter-class>site.anish_karthik.upi_net_banking.server.filter.CORSInterceptor</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>CORSInterceptor</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>AuthenticationFilter</filter-name>
+        <filter-class>site.anish_karthik.upi_net_banking.server.filter.AuthenticationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthenticationFilter</filter-name>
+        <url-pattern>/api/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>UserValidationProfileFilter</filter-name>
+        <filter-class>site.anish_karthik.upi_net_banking.server.filter.validator.UserProfileFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>UserValidationProfileFilter</filter-name>
+        <url-pattern>/profile/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>BankAccountFilter</filter-name>
+        <filter-class>site.anish_karthik.upi_net_banking.server.filter.validator.BankAccountFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>BankAccountFilter</filter-name>
+        <url-pattern>/bank/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>UpiCardAccountFilter</filter-name>
+        <filter-class>site.anish_karthik.upi_net_banking.server.filter.validator.UpiCardAccountFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>UpiCardAccountFilter</filter-name>
+        <url-pattern>/upi/*</url-pattern>
+    </filter-mapping>
 </web-app>

@@ -21,7 +21,7 @@ public class ResponseUtil {
         } else if (acceptHeader.contains("application/json") || acceptHeader.contains("*/*")) {
              response.setContentType("application/json");
              response.setStatus(statusCode);
-             var responseBuilder = ApiResponse.builder().statusCode(statusCode).message(message);
+             var responseBuilder = ApiResponse.builder().status(statusCode).message(message);
              if (data != null) responseBuilder.data(data);
             response.getWriter().write(JsonParser.toJson(responseBuilder.build()));
          } else {
@@ -34,7 +34,7 @@ public class ResponseUtil {
     @Builder
     @Data
     private static class ApiResponse {
-        private int statusCode;
+        private int status;
         private String message;
         private Object data;
     }

@@ -12,7 +12,7 @@ import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 
 import java.io.IOException;
 
-@WebFilter(urlPatterns = {"/api/user/*"})
+//@WebFilter(urlPatterns = {"/api/user/*"})
 public class BankAccountFilter implements Filter {
 
     @Override
@@ -66,7 +66,7 @@ public class BankAccountFilter implements Filter {
     }
 
     private boolean isValidCreateBankAccount(CreateBankAccountDTO dto) {
-        return dto.getAccNo() != null && dto.getIfsc() != null && dto.getBankId() != null && dto.getUserId() != null;
+        return dto.getAccNo() != null && dto.getIfsc() != null && dto.getBankId() != null;
     }
 
     private boolean isValidUpdateBankAccount(UpdateBankAccountDTO dto) {

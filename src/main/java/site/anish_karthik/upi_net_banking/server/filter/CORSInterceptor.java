@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebFilter(asyncSupported = true, urlPatterns = { "/*" })
 public class CORSInterceptor implements Filter {
 
     private static final String[] allowedOrigins = {
@@ -33,7 +32,7 @@ public class CORSInterceptor implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-
+        System.out.println("HEY I'm A filter: CORSInterceptor");
         String requestOrigin = request.getHeader("Origin");
         if (isAllowedOrigin(requestOrigin)) {
             response.setHeader("Access-Control-Allow-Origin", requestOrigin);

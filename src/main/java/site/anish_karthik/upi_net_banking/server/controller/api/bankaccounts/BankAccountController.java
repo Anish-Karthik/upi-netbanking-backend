@@ -74,6 +74,7 @@ public class BankAccountController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("I'm in doPost: Account");
         BankAccount account = HttpRequestParser.parse(req, CreateBankAccountDTO.class).toBankAccount();
         try {
             var params = PathParamExtractor.extractPathParams(req.getPathInfo(), "/(\\d+)/accounts", UserAccountParams.class);

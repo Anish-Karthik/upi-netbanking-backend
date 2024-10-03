@@ -10,6 +10,7 @@ import java.sql.Date;
 @Builder
 @Data
 public class GetUserProfileDTO {
+    private Long id;
     private String name;
     private Date dob;
     private String address;
@@ -18,6 +19,7 @@ public class GetUserProfileDTO {
 
     public User toUser() {
         return User.builder()
+                .id(id)
                 .name(name)
                 .dob(dob)
                 .address(address)
@@ -28,6 +30,7 @@ public class GetUserProfileDTO {
 
     public static GetUserProfileDTO fromUser(User user) {
         return GetUserProfileDTO.builder()
+                .id(user.getId())
                 .name(user.getName())
                 .dob(user.getDob())
                 .address(user.getAddress())

@@ -1,6 +1,7 @@
 package site.anish_karthik.upi_net_banking.server.controller.auth;
 
 import site.anish_karthik.upi_net_banking.server.dao.impl.UserDaoImpl;
+import site.anish_karthik.upi_net_banking.server.dto.SessionUserDTO;
 import site.anish_karthik.upi_net_banking.server.model.User;
 import site.anish_karthik.upi_net_banking.server.service.AuthService;
 
@@ -34,10 +35,10 @@ public class LoginServlet extends HttpServlet {
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials", null);
             return;
         }
-
+        var sessionUser = SessionUserDTO.fromUser(userOpt.get());
         // Create session
         HttpSession session = req.getSession(true);
-        session.setAttribute("user", userOpt.get());
+        session.setAttribute("user", sessionUser);
 
         // Set session cookie
         Cookie sessionCookie = new Cookie("SESSIONID", session.getId());
@@ -47,6 +48,6 @@ public class LoginServlet extends HttpServlet {
         sessionCookie.setMaxAge(30 * 60); // 30 minutes expiration
 
         resp.addCookie(sessionCookie);
-        ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Login successful", userOpt.get());
+        ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Login successful", sessionUser);
     }
 }

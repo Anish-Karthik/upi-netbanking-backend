@@ -25,12 +25,12 @@ public class BankAccountDaoImpl implements BankAccountDao {
 
     @Override
     public BankAccount save(BankAccount bankAccount) {
-        String sql = "INSERT INTO bank_account (acc_no, ifsc, bank_id, user_id, balance, created_at, account_type, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            setFields(bankAccount, stmt);
-            stmt.executeUpdate();
+        try {
+            QueryResult queryResult = queryBuilderUtil.createInsertQuery("bank_account", bankAccount);
+            System.out.println(queryResult);
+            queryBuilderUtil.executeDynamicQuery(connection, queryResult);
             return bankAccount;
-        } catch (SQLException e) {
+        } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -88,17 +88,6 @@ public class BankAccountDaoImpl implements BankAccountDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void setFields(BankAccount bankAccount, PreparedStatement stmt) throws SQLException {
-        stmt.setString(1, bankAccount.getAccNo());
-        stmt.setString(2, bankAccount.getIfsc());
-        stmt.setLong(3, bankAccount.getBankId());
-        stmt.setLong(4, bankAccount.getUserId());
-        stmt.setBigDecimal(5, bankAccount.getBalance());
-        stmt.setTimestamp(6, bankAccount.getCreatedAt());
-        stmt.setString(7, bankAccount.getAccountType().name());
-        stmt.setString(8, bankAccount.getStatus().name());
     }
 
     private BankAccount mapResultSetToBankAccount(ResultSet rs) throws SQLException {
