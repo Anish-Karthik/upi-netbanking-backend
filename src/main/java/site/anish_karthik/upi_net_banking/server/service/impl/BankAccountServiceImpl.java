@@ -70,4 +70,14 @@ public class BankAccountServiceImpl implements BankAccountService {
             }
         });
     }
+
+    @Override
+    public void reopenBankAccount(String accNo) {
+        bankAccountDao.update(BankAccount.builder().accNo(accNo).status(AccountStatus.ACTIVE).build());
+    }
+
+    @Override
+    public void closeBankAccount(String accNo) {
+        deleteBankAccount(accNo);
+    }
 }

@@ -52,7 +52,6 @@ public class BankAccountController extends HttpServlet {
             var params = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/accounts/?(\\d+)?", UserAccountParams.class);
 
             if (params.getUserId() != null && params.getAccNo() != null) {
-                // Extract the account number from URL
                 GetBankAccountDTO account = bankAccountService.getBankAccountWithBankByAccNo(params.getAccNo());
                 if (account != null) {
                     ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account found", account);
@@ -74,11 +73,19 @@ public class BankAccountController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo();
         System.out.println("I'm in doPost: Account");
-        BankAccount account = HttpRequestParser.parse(req, CreateBankAccountDTO.class).toBankAccount();
         try {
-            var params = PathParamExtractor.extractPathParams(req.getPathInfo(), "/(\\d+)/accounts", UserAccountParams.class);
-            if (params.getUserId() != null) {
+            var params = PathParamExtractor.extractPathParams(req.getPathInfo(), "/(\\d+)/accounts/?(\\d+)?.*", UserAccountParams.class);
+            System.out.println("I'm in doPost: " + params.getUserId());
+            if (pathInfo.matches("/\\d+/accounts/\\d+/reopen")) {
+                bankAccountService.reopenBankAccount(params.getAccNo());
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account reopened", null);
+            } else if (pathInfo.matches("/\\d+/accounts/\\d+/close")) {
+                bankAccountService.closeBankAccount(params.getAccNo());
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account closed", null);
+            } else if (params.getUserId() != null) {
+                BankAccount account = HttpRequestParser.parse(req, CreateBankAccountDTO.class).toBankAccount();
                 System.out.println("I'm in doPost: " + params.getUserId());
                 account.setUserId(params.getUserId());
                 var result = CreateBankAccountDTO.fromBankAccount(bankAccountService.addBankAccount(account));

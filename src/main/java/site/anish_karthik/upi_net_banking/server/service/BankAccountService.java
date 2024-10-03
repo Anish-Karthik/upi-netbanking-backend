@@ -13,4 +13,6 @@ public interface BankAccountService {
     BankAccount addBankAccount(BankAccount account);
     BankAccount updateBankAccount(BankAccount account);
     void deleteBankAccount(String accNo);
+    void reopenBankAccount(String accNo);
+    void closeBankAccount(String accNo);
 }

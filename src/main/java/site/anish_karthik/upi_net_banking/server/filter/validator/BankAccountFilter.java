@@ -26,7 +26,9 @@ public class BankAccountFilter implements Filter {
 
         CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(httpRequest);
         System.out.println("HEY I'm A filter: BankAccountFilter");
-        if (pathInfo != null && pathInfo.matches("/\\d+/accounts/?(\\d+)?")) {
+        if (pathInfo != null && pathInfo.matches("/\\d+/accounts/\\d+/\\S+") &&pathInfo.endsWith("/reopen") || pathInfo.endsWith("/close")) {
+            chain.doFilter(request, response);
+        } else if (pathInfo.matches("/\\d+/accounts/?(\\d+)?")) {
             if ("POST".equals(method)) {
                 validateCreateBankAccountRequest(cachedRequest, httpResponse, chain);
             } else if ("PUT".equals(method)) {
