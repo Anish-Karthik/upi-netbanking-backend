@@ -5,6 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import site.anish_karthik.upi_net_banking.server.controller.api.users.accounts.AccountRouter;
 import site.anish_karthik.upi_net_banking.server.controller.api.users.beneficiaries.BeneficiaryRouter;
 import site.anish_karthik.upi_net_banking.server.controller.api.users.profile.ProfileRouter;
 import site.anish_karthik.upi_net_banking.server.router.Router;
@@ -20,6 +21,7 @@ public class UserController extends HttpServlet {
         router = new Router("/server_war_exploded/api/users");
         new BeneficiaryRouter().register(router);
         new ProfileRouter().register(router);
+        new AccountRouter().register(router);
     }
 
     @Override
