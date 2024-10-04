@@ -2,6 +2,7 @@ package site.anish_karthik.upi_net_banking.server.controller.api.bankaccounts;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import site.anish_karthik.upi_net_banking.server.dto.AccountStatusDTO;
 import site.anish_karthik.upi_net_banking.server.dto.CreateBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.dto.GetBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.dto.UpdateBankAccountDTO;
@@ -84,6 +85,12 @@ public class BankAccountController extends HttpServlet {
             } else if (pathInfo.matches("/\\d+/accounts/\\d+/close")) {
                 bankAccountService.closeBankAccount(params.getAccNo());
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account closed", null);
+            } else if (pathInfo.matches("/\\d+/accounts/\\d+/status")) {
+                AccountStatusDTO statusDTO = HttpRequestParser.parse(req, AccountStatusDTO.class);
+                BankAccount account = statusDTO.toBankAccount();
+                account.setAccNo(params.getAccNo());
+                statusDTO = AccountStatusDTO.fromBankAccount(bankAccountService.updateBankAccount(account));
+                ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Account status updated", statusDTO);
             } else if (params.getUserId() != null) {
                 BankAccount account = HttpRequestParser.parse(req, CreateBankAccountDTO.class).toBankAccount();
                 System.out.println("I'm in doPost: " + params.getUserId());
