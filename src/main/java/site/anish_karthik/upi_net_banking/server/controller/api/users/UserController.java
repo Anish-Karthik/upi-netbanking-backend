@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.controller.api.users.beneficiaries.BeneficiaryRouter;
+import site.anish_karthik.upi_net_banking.server.controller.api.users.profile.ProfileRouter;
 import site.anish_karthik.upi_net_banking.server.router.Router;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ public class UserController extends HttpServlet {
     public void init() throws ServletException {
         router = new Router("/server_war_exploded/api/users");
         new BeneficiaryRouter().register(router);
+        new ProfileRouter().register(router);
     }
 
     @Override
