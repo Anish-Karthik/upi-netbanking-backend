@@ -1,22 +1,18 @@
 package site.anish_karthik.upi_net_banking.server.controller.api.bankaccounts;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import site.anish_karthik.upi_net_banking.server.dto.AccountStatusDTO;
 import site.anish_karthik.upi_net_banking.server.dto.CreateBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.dto.GetBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.dto.UpdateBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
-import site.anish_karthik.upi_net_banking.server.model.enums.AccountStatus;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.impl.BankAccountServiceImpl;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.HttpRequestParser;
 import site.anish_karthik.upi_net_banking.server.utils.PathParamExtractor;
 import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
