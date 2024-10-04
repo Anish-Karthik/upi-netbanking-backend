@@ -15,14 +15,12 @@ public class AppServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         router = new Router("/server_war_exploded/demo");
-        System.out.println("haha");
         // Register routes
         DemoUserRoutes.register(router);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("hehe");
         router.handle(req, resp);
     }
 
