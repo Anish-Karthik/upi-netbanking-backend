@@ -29,7 +29,7 @@ public class Router {
     @Data
     private static class Route {
         private Pattern pattern;
-        private BiConsumer<HttpServletRequest, HttpServletResponse> handler;
+        private BiConsumer<HttpServletRequest, HttpServletResponse>     handler;
 
         public Route(Pattern pattern, BiConsumer<HttpServletRequest, HttpServletResponse> handler) {
             this.pattern = pattern;

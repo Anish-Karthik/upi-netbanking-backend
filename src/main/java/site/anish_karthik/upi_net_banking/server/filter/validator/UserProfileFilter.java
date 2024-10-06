@@ -39,7 +39,7 @@ public class UserProfileFilter implements Filter {
         // Parse request body into UpdateUserDTO (similar approach as above)
         try {
             UserProfileDTO profileDTO = HttpRequestParser.parse(request, UserProfileDTO.class);
-            System.out.println(profileDTO + " VALIDATE");
+//            System.out.println(profileDTO + " VALIDATE");
             if (profileDTO != null && isValidProfile(profileDTO) ) {
                 chain.doFilter(request, response);  // Proceed to the servlet
             } else {

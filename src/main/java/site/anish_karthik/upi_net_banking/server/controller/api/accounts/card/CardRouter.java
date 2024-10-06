@@ -34,7 +34,7 @@ public class CardRouter {
     }
 
     public void register(Router router) {
-        router.get("/\\d+/card/\\d+", this::getCardByCardNo);
+        router.get("/\\d+/card/\\d+", (req, resp) -> getCardByCardNo(req, resp));
         router.get("/\\d+/card", this::getCardByAccNo);
         router.post("/\\d+/card", this::createCard);
         router.put("/\\d+/card/\\d+/pin", this::updateCardPin);
