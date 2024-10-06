@@ -34,7 +34,7 @@
     </filter>
     <filter-mapping>
         <filter-name>UserValidationProfileFilter</filter-name>
-        <url-pattern>/profile/*</url-pattern>
+        <url-pattern>/api/profile/*</url-pattern>
     </filter-mapping>
     <filter>
         <filter-name>BankAccountFilter</filter-name>
@@ -42,7 +42,7 @@
     </filter>
     <filter-mapping>
         <filter-name>BankAccountFilter</filter-name>
-        <url-pattern>/bank/*</url-pattern>
+        <url-pattern>/api/users/*</url-pattern>
     </filter-mapping>
     <filter>
         <filter-name>UpiCardAccountFilter</filter-name>
@@ -50,34 +50,34 @@
     </filter>
     <filter-mapping>
         <filter-name>UpiCardAccountFilter</filter-name>
-        <url-pattern>/upi/*</url-pattern>
+        <url-pattern>/api/upi/*</url-pattern>
     </filter-mapping>
 
-        <servlet>
-            <servlet-name>UpiController</servlet-name>
-            <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.UpiController</servlet-class>
-        </servlet>
-        <servlet-mapping>
-            <servlet-name>UpiController</servlet-name>
-            <url-pattern>/api/accounts/*/upi</url-pattern>
-        </servlet-mapping>
+<!--        <servlet>-->
+<!--            <servlet-name>UpiController</servlet-name>-->
+<!--            <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.UpiController</servlet-class>-->
+<!--        </servlet>-->
+<!--        <servlet-mapping>-->
+<!--            <servlet-name>UpiController</servlet-name>-->
+<!--            <url-pattern>/api/accounts/*</url-pattern>-->
+<!--        </servlet-mapping>-->
 
-        <servlet>
-            <servlet-name>CardController</servlet-name>
-            <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.CardController</servlet-class>
-        </servlet>
-        <servlet-mapping>
-            <servlet-name>CardController</servlet-name>
-            <url-pattern>/api/accounts/*/card</url-pattern>
-        </servlet-mapping>
+<!--        <servlet>-->
+<!--            <servlet-name>CardController</servlet-name>-->
+<!--            <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.CardController</servlet-class>-->
+<!--        </servlet>-->
+<!--        <servlet-mapping>-->
+<!--            <servlet-name>CardController</servlet-name>-->
+<!--            <url-pattern>/api/accounts/*</url-pattern>-->
+<!--        </servlet-mapping>-->
 
-    <servlet>
-        <servlet-name>DemoServlet</servlet-name>
-        <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.DemoServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>DemoServlet</servlet-name>
-        <url-pattern>/demo*</url-pattern>
-    </servlet-mapping>
+<!--    <servlet>-->
+<!--        <servlet-name>DemoServlet</servlet-name>-->
+<!--        <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.DemoServlet</servlet-class>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>DemoServlet</servlet-name>-->
+<!--        <url-pattern>/demo*</url-pattern>-->
+<!--    </servlet-mapping>-->
 
 </web-app>
