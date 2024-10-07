@@ -24,10 +24,13 @@ public class BankAccountFilter implements Filter {
 
         String method = httpRequest.getMethod();
         String pathInfo = httpRequest.getPathInfo();
-
+        if (pathInfo == null || !pathInfo.matches("/\\d+/accounts/?.*")) {
+            chain.doFilter(request, response);
+            return;
+        }
         CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(httpRequest);
         System.out.println("HEY I'm A filter: BankAccountFilter");
-        if (pathInfo != null && pathInfo.matches("/\\d+/accounts/\\d+/\\S+") &&pathInfo.endsWith("/reopen") || pathInfo.endsWith("/close")) {
+        if (pathInfo.matches("/\\d+/accounts/\\d+/\\S+") &&pathInfo.endsWith("/reopen") || pathInfo.endsWith("/close")) {
             chain.doFilter(request, response);
         } else if (pathInfo.matches("/\\d+/accounts/?(\\d+)?")) {
             if ("POST".equals(method)) {
@@ -46,7 +49,7 @@ public class BankAccountFilter implements Filter {
         try {
             CreateBankAccountDTO createDTO = HttpRequestParser.parse(request, CreateBankAccountDTO.class);
             if (createDTO != null && isValidCreateBankAccount(createDTO)) {
-                if (handleValidation(createDTO, request, response, chain)) {
+                if (handleValidation(createDTO, request, response)) {
                     chain.doFilter(request, response);
                 }
             } else {
@@ -78,7 +81,7 @@ public class BankAccountFilter implements Filter {
         return dto.getAccountType() != null && dto.getStatus() != null;
     }
 
-    private Boolean handleValidation(CreateBankAccountDTO dto,HttpServletRequest req, HttpServletResponse response, FilterChain chain) throws IOException {
+    private Boolean handleValidation(CreateBankAccountDTO dto,HttpServletRequest req, HttpServletResponse response) throws IOException {
         Validator<String> accNoValidator = new ValidatorBuilder<String>()
                 .addNotNull("Account number cannot be null")
                 .addRegex("^[0-9]+$", "Invalid account number")

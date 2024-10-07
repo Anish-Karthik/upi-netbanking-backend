@@ -1,7 +1,6 @@
 package site.anish_karthik.upi_net_banking.server.filter.validator;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.dto.UserProfileDTO;
@@ -21,12 +20,15 @@ public class UserProfileFilter implements Filter {
 
         String method = httpRequest.getMethod();
         String pathInfo = httpRequest.getPathInfo();
+        if (pathInfo == null || !pathInfo.matches("/\\d+/profile")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-        CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(httpRequest);
+        System.out.println("HEY I'm Profile filter");
 
-        System.out.println("HEY I'm A filter");
-
-        if (pathInfo != null && pathInfo.matches("/\\d+") && "PUT".equals(method)) {
+        if ("PUT".equals(method)) {
+            CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(httpRequest);
             // Validate PUT /users/{user_id}
             validateUpdateUserProfileRequest(cachedRequest, httpResponse, chain);
         } else {
@@ -39,7 +41,6 @@ public class UserProfileFilter implements Filter {
         // Parse request body into UpdateUserDTO (similar approach as above)
         try {
             UserProfileDTO profileDTO = HttpRequestParser.parse(request, UserProfileDTO.class);
-//            System.out.println(profileDTO + " VALIDATE");
             if (profileDTO != null && isValidProfile(profileDTO) ) {
                 chain.doFilter(request, response);  // Proceed to the servlet
             } else {

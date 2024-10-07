@@ -2,6 +2,7 @@ package site.anish_karthik.upi_net_banking.server.controller.api.users.profile;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Data;
 import site.anish_karthik.upi_net_banking.server.dao.impl.UserDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dto.GetUserProfileDTO;
 import site.anish_karthik.upi_net_banking.server.dto.UserProfileDTO;
@@ -20,10 +21,6 @@ public class ProfileRouter {
     private final UserService userService;
     private static final Logger LOGGER = Logger.getLogger(ProfileRouter.class.getName());
 
-    public ProfileRouter(UserService userService) {
-        this.userService = userService;
-    }
-
     public ProfileRouter() {
         try {
             userService = new UserServiceImpl(new UserDaoImpl(DatabaseUtil.getConnection()));
@@ -33,8 +30,8 @@ public class ProfileRouter {
     }
 
     public void register(Router router) {
-        router.get("/\\d+/profile", this::getUserProfile);
-        router.put("/\\d+/profile", this::updateUserProfile);
+        router.get("/:userId/profile", this::getUserProfile);
+        router.put("/:userId/profile", this::updateUserProfile);
     }
 
     private void getUserProfile(HttpServletRequest req, HttpServletResponse resp) {
@@ -60,6 +57,7 @@ public class ProfileRouter {
 
     private void updateUserProfile(HttpServletRequest req, HttpServletResponse resp) {
         String pathInfo = req.getPathInfo();
+        System.out.println("HEY I'm Profile router");
         try {
             var userProfileParams = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/profile", UserProfileParams.class);
             if (userProfileParams.getUserId() != null) {
@@ -76,16 +74,9 @@ public class ProfileRouter {
         }
     }
 
+    @Data
     public static class UserProfileParams {
         private Long userId;
-
-        public Long getUserId() {
-            return userId;
-        }
-
-        public void setUserId(Long userId) {
-            this.userId = userId;
-        }
     }
 
     private void handleException(HttpServletRequest req, HttpServletResponse resp, Exception e) {
