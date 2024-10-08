@@ -82,6 +82,4 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionDao.findByAccNo(accNo);
     }
 
-
-
 }

@@ -8,4 +8,5 @@ public interface TransactionStrategy {
     void execute(Transaction transaction) throws Exception;
 //    takes in a CallBack function which takes in a Transaction object and returns a Transaction object
     Transaction execute(Transaction transaction, Function<Transaction, Transaction> handle) throws Exception;
+    Boolean verifyPermission(Transaction transaction) throws Exception;
 }

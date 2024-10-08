@@ -13,13 +13,24 @@ public class UPIDeposit implements TransactionStrategy {
     }
 
     @Override
+    public Boolean verifyPermission(Transaction transaction) throws Exception {
+//        return bankAccountService.verifyPermission(transaction);
+        return true;
+    }
+    @Override
     public void execute(Transaction transaction) throws Exception {
+        if (!verifyPermission(transaction)) {
+            throw new RuntimeException("No permission found");
+        }
         // Logic for UPI deposit
         bankAccountService.deposit(transaction);
     }
 
     @Override
     public Transaction execute(Transaction transaction, Function<Transaction, Transaction> handle) throws Exception {
+        if (!verifyPermission(transaction)) {
+            throw new RuntimeException("No permission found");
+        }
         return handle.apply(transaction);
     }
 }
