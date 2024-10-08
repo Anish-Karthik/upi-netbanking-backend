@@ -5,11 +5,14 @@ import site.anish_karthik.upi_net_banking.server.dao.BankAccountDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.BankAccountDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dto.GetBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
+import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.AccountStatus;
+import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.PaymentMethodService;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -33,12 +36,12 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public List<BankAccount> getBankAccountsByUserId(long userId) {
+    public List<BankAccount> getBankAccountsByUserId(Long userId) {
         return bankAccountDao.findByUserId(userId);
     }
 
     @Override
-    public List<GetBankAccountDTO> getBankAccountsWithBankByUserId(long userId) {
+    public List<GetBankAccountDTO> getBankAccountsWithBankByUserId(Long userId) {
         return bankAccountDao.findByUserIdWithBank(userId);
     }
 
@@ -80,4 +83,45 @@ public class BankAccountServiceImpl implements BankAccountService {
     public void closeBankAccount(String accNo) {
         deleteBankAccount(accNo);
     }
+
+    @Override
+    public void updateAccountBalance(Transaction transaction) throws Exception {
+        BigDecimal amount = transaction.getAmount();
+        if (amount.compareTo(BigDecimal.ZERO) == 0) {
+            throw new Exception("Amount cannot be zero");
+        }
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new Exception("Amount cannot be negative");
+        }
+        if (transaction.getTransactionType() == TransactionType.WITHDRAWAL) {
+            amount = amount.negate();
+        }
+        bankAccountDao.updateAccountBalance(transaction.getAccNo(), amount);
+    }
+
+    @Override
+    public void rollbackAccountBalanceUpdate(Transaction transaction) throws Exception {
+        BankAccount account = bankAccountDao.findByTransactionId(transaction.getTransactionId()).orElseThrow(() -> new Exception("Account not found"));
+        if (transaction.getTransactionType() == TransactionType.WITHDRAWAL) {
+            account.setBalance(account.getBalance().add(transaction.getAmount()));
+        } else {
+            account.setBalance(account.getBalance().subtract(transaction.getAmount()));
+        }
+        bankAccountDao.update(account);
+    }
+
+    @Override
+    public void deposit(Transaction transaction) throws Exception {
+        BankAccount account = bankAccountDao.findByTransactionId(transaction.getTransactionId()).orElseThrow(() -> new Exception("Account not found"));
+        account.setBalance(account.getBalance().add(transaction.getAmount()));
+        bankAccountDao.update(account);
+    }
+
+    @Override
+    public void withdraw(Transaction transaction) throws Exception {
+        BankAccount account = bankAccountDao.findByTransactionId(transaction.getTransactionId()).orElseThrow(() -> new Exception("Account not found"));
+        account.setBalance(account.getBalance().subtract(transaction.getAmount()));
+        bankAccountDao.update(account);
+    }
+
 }

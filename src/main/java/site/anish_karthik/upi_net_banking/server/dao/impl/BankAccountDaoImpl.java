@@ -10,6 +10,7 @@ import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,12 +105,27 @@ public class BankAccountDaoImpl implements BankAccountDao {
     }
 
     @Override
-    public List<BankAccount> findByUserId(long userId) {
+    public List<BankAccount> findByUserId(Long userId) {
         return getBankAccounts(userId, "SELECT * FROM bank_account WHERE user_id = ?");
     }
 
     @Override
-    public List<GetBankAccountDTO> findByUserIdWithBank(long userId) {
+    public Optional<BankAccount> findByTransactionId(Long transactionId) {
+        String sql = "SELECT ba.* FROM bank_account ba JOIN transaction t ON ba.acc_no = t.acc_no WHERE t.id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, transactionId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return Optional.of(mapResultSetToBankAccount(rs));
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<GetBankAccountDTO> findByUserIdWithBank(Long userId) {
         String sql = "SELECT ba.*, b.* FROM bank_account ba JOIN bank b ON ba.bank_id = b.id WHERE ba.user_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, userId);
@@ -159,6 +175,41 @@ public class BankAccountDaoImpl implements BankAccountDao {
             return bankAccounts;
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void updateAccountBalance(String accNo, BigDecimal amount) throws Exception {
+        String selectSql = "SELECT balance FROM bank_account WHERE acc_no = ? FOR UPDATE";
+        String updateSql = "UPDATE bank_account SET balance = balance + ? WHERE acc_no = ?";
+        try (PreparedStatement selectStmt = connection.prepareStatement(selectSql);
+             PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
+
+            connection.setAutoCommit(false); // Start transaction
+
+            // Lock the row and get the current balance
+            selectStmt.setString(1, accNo);
+            ResultSet rs = selectStmt.executeQuery();
+            if (!rs.next()) {
+                throw new Exception("Account not found");
+            }
+            BigDecimal currentBalance = rs.getBigDecimal("balance");
+
+            if (amount.compareTo(BigDecimal.ZERO) < 0 && currentBalance.add(amount).compareTo(BigDecimal.ZERO) < 0) {
+                throw new Exception("Insufficient balance");
+            }
+
+            // Update the balance
+            updateStmt.setBigDecimal(1, amount);
+            updateStmt.setString(2, accNo);
+            updateStmt.executeUpdate();
+
+            connection.commit(); // Commit transaction
+        } catch (SQLException e) {
+            connection.rollback(); // Rollback transaction on error
+            throw new Exception(e);
+        } finally {
+            connection.setAutoCommit(true); // Reset auto-commit mode
         }
     }
 }

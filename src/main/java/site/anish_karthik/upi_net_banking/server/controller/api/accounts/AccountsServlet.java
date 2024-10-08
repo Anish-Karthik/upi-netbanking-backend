@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.controller.api.accounts.card.CardRouter;
+import site.anish_karthik.upi_net_banking.server.controller.api.accounts.transaction.TransactionRouter;
 import site.anish_karthik.upi_net_banking.server.controller.api.accounts.upi.UPIRouter;
 import site.anish_karthik.upi_net_banking.server.router.Router;
 import site.anish_karthik.upi_net_banking.server.service.impl.UpiServiceImpl;
@@ -20,8 +21,8 @@ public class AccountsServlet extends HttpServlet {
     public void init() throws ServletException {
         router = new Router("/server_war_exploded/api/accounts");
         // Register routes
-//        CardRouter.register(router);
         System.out.println("Registering card router");
+        new TransactionRouter().register(router);
         CardRouter.getInstance().register(router);
         try {
             new UPIRouter(new UpiServiceImpl(), "\\S+@\\S+").register(router);

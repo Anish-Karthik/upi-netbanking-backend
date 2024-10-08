@@ -1,4 +1,4 @@
-package site.anish_karthik.upi_net_banking.server.strategies;
+package site.anish_karthik.upi_net_banking.server.strategy;
 
 import site.anish_karthik.upi_net_banking.server.model.Permission;
 

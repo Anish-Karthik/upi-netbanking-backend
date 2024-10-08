@@ -15,9 +15,9 @@ import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 @Builder
 @Data
 public class Transaction {
-    private long transactionId;
+    private Long transactionId;
     private String accNo;
-    private long userId;
+    private Long userId;
     private BigDecimal amount;
     private TransactionType transactionType;
     private TransactionStatus transactionStatus;
@@ -26,4 +26,18 @@ public class Transaction {
     private Timestamp startedAt;
     private Timestamp endedAt;
     private String referenceId;
+
+    public enum PaymentMethod {
+        CARD, UPI, ACCOUNT
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        if (byCardNo != null) {
+            return PaymentMethod.CARD;
+        } else if (upiId != null) {
+            return PaymentMethod.UPI;
+        } else {
+            return PaymentMethod.ACCOUNT;
+        }
+    }
 }
