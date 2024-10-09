@@ -2,12 +2,14 @@ package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.PermissionDao;
 import site.anish_karthik.upi_net_banking.server.model.Permission;
+import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Optional;
 
 public class PermissionDaoImpl implements PermissionDao {
@@ -15,8 +17,12 @@ public class PermissionDaoImpl implements PermissionDao {
     private final String tableName = "permission";
     private final String idColumn = "id";
     private final QueryBuilderUtil queryBuilderUtil = new QueryBuilderUtil();
-    public PermissionDaoImpl(Connection connection) {
-        this.connection = connection;
+    public PermissionDaoImpl() {
+        try {
+            this.connection = DatabaseUtil.getConnection();
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // methods

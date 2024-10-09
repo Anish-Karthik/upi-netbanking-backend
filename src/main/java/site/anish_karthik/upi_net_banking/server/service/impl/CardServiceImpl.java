@@ -4,6 +4,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import site.anish_karthik.upi_net_banking.server.dao.CardDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.CardDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dto.*;
+import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Card;
 import site.anish_karthik.upi_net_banking.server.model.PaymentMethod;
 import site.anish_karthik.upi_net_banking.server.model.enums.CardStatus;
@@ -13,6 +14,7 @@ import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 public  class CardServiceImpl implements CardService {
     private final CardDao cardDao;
@@ -82,5 +84,10 @@ public  class CardServiceImpl implements CardService {
         System.out.println("Deactivating cards: ");
         cardDao.updateManyByAccNo(Card.builder().accNo(accNo).status(CardStatus.CLOSED).build(), accNo);
         return cardDao.findByAccNo(accNo).stream().map(card -> (PaymentMethod) card).toList();
+    }
+
+    @Override
+    public Optional<BankAccount> getAccountDetails(String cardNo) throws Exception {
+        return cardDao.getAccountDetails(cardNo);
     }
 }

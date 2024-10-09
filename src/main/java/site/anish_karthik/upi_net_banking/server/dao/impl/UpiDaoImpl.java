@@ -1,6 +1,7 @@
 package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.UpiDao;
+import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
@@ -121,6 +122,21 @@ public class UpiDaoImpl implements UpiDao {
             System.out.println("UPI:::Executed query");
         } catch (IllegalAccessException | SQLException e) {
             System.out.printf("UPI:::Exception: %s\n", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Optional<BankAccount> getAccountDetails(String upiId) {
+        String sql = "SELECT * FROM bank_account WHERE acc_no = (SELECT acc_no FROM upi WHERE upi_id = ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, upiId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return Optional.of(ResultSetMapper.mapResultSetToObject(rs, BankAccount.class));
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }

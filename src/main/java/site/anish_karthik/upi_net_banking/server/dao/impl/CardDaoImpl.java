@@ -1,6 +1,7 @@
 package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.CardDao;
+import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Card;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
@@ -130,6 +131,21 @@ public class CardDaoImpl implements CardDao {
             System.out.println("Cards updated");
         } catch (IllegalAccessException | SQLException e) {
             System.out.printf("Error updating cards for account %s\n", accNo);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Optional<BankAccount> getAccountDetails(String cardNo) {
+        String sql = "SELECT * FROM bank_account WHERE acc_no = (SELECT acc_no FROM card WHERE card_no = ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, cardNo);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return Optional.of(ResultSetMapper.mapResultSetToObject(rs, BankAccount.class));
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }

@@ -15,4 +15,11 @@ public class Permission {
     private boolean canWithdraw;
     private boolean canSendMoney;
     private boolean canReceiveMoney;
+
+    public Permission(boolean canDeposit, boolean canWithdraw, boolean canSendMoney, boolean canReceiveMoney) {
+        this.canDeposit = canDeposit;
+        this.canWithdraw = canWithdraw;
+        this.canSendMoney = canSendMoney;
+        this.canReceiveMoney = canReceiveMoney;
+    }
 }

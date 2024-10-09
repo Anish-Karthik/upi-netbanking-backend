@@ -20,17 +20,17 @@ public class TransactionFactory {
     }
 
     private void initializeStrategies() {
-        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.UPI, TransactionType.DEPOSIT, TransactionCategory.SOLO), new UPIDeposit(bankAccountService));
-        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.CARD, TransactionType.DEPOSIT, TransactionCategory.SOLO), new CardDeposit(bankAccountService));
-        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.CARD, TransactionType.WITHDRAWAL, TransactionCategory.SOLO), new CardWithdrawal(bankAccountService));
-        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.ACCOUNT, TransactionType.DEPOSIT, TransactionCategory.SOLO), new AccountDeposit(bankAccountService));
+        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.UPI, TransactionType.DEPOSIT, TransactionCategory.SOLO), new UPIDeposit(bankAccountService, TransactionCategory.SOLO));
+        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.CARD, TransactionType.DEPOSIT, TransactionCategory.SOLO), new CardDeposit(bankAccountService, TransactionCategory.SOLO));
+        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.CARD, TransactionType.WITHDRAWAL, TransactionCategory.SOLO), new CardWithdrawal(bankAccountService, TransactionCategory.SOLO));
+        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.ACCOUNT, TransactionType.DEPOSIT, TransactionCategory.SOLO), new AccountDeposit(bankAccountService, TransactionCategory.SOLO));
 
         // Transaction Category - Transfer
-        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.UPI, TransactionType.DEPOSIT, TransactionCategory.TRANSFER), new UPIDeposit(bankAccountService));
-        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.UPI, TransactionType.WITHDRAWAL, TransactionCategory.TRANSFER), new UPIWithdrawal(bankAccountService));
-        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.CARD, TransactionType.WITHDRAWAL, TransactionCategory.TRANSFER), new CardWithdrawal(bankAccountService));
-        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.ACCOUNT, TransactionType.DEPOSIT, TransactionCategory.TRANSFER), new AccountDeposit(bankAccountService));
-        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.ACCOUNT, TransactionType.WITHDRAWAL, TransactionCategory.TRANSFER), new AccountWithdrawal(bankAccountService));
+        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.UPI, TransactionType.DEPOSIT, TransactionCategory.TRANSFER), new UPIDeposit(bankAccountService, TransactionCategory.TRANSFER));
+        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.UPI, TransactionType.WITHDRAWAL, TransactionCategory.TRANSFER), new UPIWithdrawal(bankAccountService, TransactionCategory.TRANSFER));
+        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.CARD, TransactionType.WITHDRAWAL, TransactionCategory.TRANSFER), new CardWithdrawal(bankAccountService, TransactionCategory.TRANSFER));
+        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.ACCOUNT, TransactionType.DEPOSIT, TransactionCategory.TRANSFER), new AccountDeposit(bankAccountService, TransactionCategory.TRANSFER));
+        strategyMap.put(new TransactionKey(Transaction.PaymentMethod.ACCOUNT, TransactionType.WITHDRAWAL, TransactionCategory.TRANSFER), new AccountWithdrawal(bankAccountService, TransactionCategory.TRANSFER));
     }
 
     public TransactionStrategy getStrategy(Transaction.PaymentMethod paymentMethod, TransactionType transactionType, TransactionCategory transactionCategory) {

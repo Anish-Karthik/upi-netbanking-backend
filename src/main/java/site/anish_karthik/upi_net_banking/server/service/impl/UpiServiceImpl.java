@@ -9,6 +9,7 @@ import site.anish_karthik.upi_net_banking.server.dao.impl.BankAccountDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dao.impl.UserDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dto.*;
 import site.anish_karthik.upi_net_banking.server.exception.UpiException;
+import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.PaymentMethod;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
 import site.anish_karthik.upi_net_banking.server.model.User;
@@ -20,6 +21,7 @@ import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.UpiUtil;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UpiServiceImpl implements UpiService {
 
@@ -130,6 +132,11 @@ public class UpiServiceImpl implements UpiService {
     public List<PaymentMethod> deactivateByAccNo(String accNo) {
         upiDao.updateManyByAccNo(Upi.builder().accNo(accNo).status(UpiStatus.CLOSED).build(), accNo);
         return upiDao.findByAccNo(accNo).stream().map(upi ->  (PaymentMethod) upi).toList();
+    }
+
+    @Override
+    public Optional<BankAccount> getAccountDetails(String upiId) throws Exception {
+        return upiDao.getAccountDetails(upiId);
     }
 
     @Override

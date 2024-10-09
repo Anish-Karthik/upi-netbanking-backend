@@ -1,14 +1,18 @@
 package site.anish_karthik.upi_net_banking.server.service.impl;
 
+import site.anish_karthik.upi_net_banking.server.dao.impl.PermissionDaoImpl;
 import site.anish_karthik.upi_net_banking.server.model.Permission;
 import site.anish_karthik.upi_net_banking.server.dao.PermissionDao;
 import site.anish_karthik.upi_net_banking.server.service.PermissionService;
+import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
+
+import java.sql.SQLException;
 
 public class PermissionServiceImpl implements PermissionService {
     private final PermissionDao permissionDao;
 
-    public PermissionServiceImpl(PermissionDao permissionDao) {
-        this.permissionDao = permissionDao;
+    public PermissionServiceImpl() {
+        this.permissionDao = new PermissionDaoImpl();
     }
 
     @Override
