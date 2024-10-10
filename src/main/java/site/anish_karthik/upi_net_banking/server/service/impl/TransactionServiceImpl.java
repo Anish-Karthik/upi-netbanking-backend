@@ -1,20 +1,21 @@
 package site.anish_karthik.upi_net_banking.server.service.impl;
 
+import site.anish_karthik.upi_net_banking.server.command.Command;
+import site.anish_karthik.upi_net_banking.server.command.impl.account.UpdateAccountBalanceCommand;
+import site.anish_karthik.upi_net_banking.server.command.impl.transaction.CreateTransactionCommand;
+import site.anish_karthik.upi_net_banking.server.command.invoker.TransferInvoker;
 import site.anish_karthik.upi_net_banking.server.dao.TransactionDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.TransactionDaoImpl;
 import site.anish_karthik.upi_net_banking.server.factories.method.TransactionFactory;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory;
-import site.anish_karthik.upi_net_banking.server.model.enums.TransactionStatus;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.TransactionService;
 import site.anish_karthik.upi_net_banking.server.strategy.transactions.TransactionStrategy;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 
 public class TransactionServiceImpl implements TransactionService {
     private final BankAccountService bankAccountService;
@@ -33,21 +34,37 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction createTransaction(Transaction transaction) throws Exception {
+        System.out.println("TransactionServiceImpl createTransaction");
         return transactionDao.save(transaction);
     }
 
     @Override
     public Transaction makeTransaction(Transaction transaction) {
-//        bankAccountService.deductAmount(transaction);
-        transaction = transactionDao.save(transaction);
+        TransferInvoker invoker = new TransferInvoker();
+        Command createTransactionCommand = new CreateTransactionCommand(transaction);
+
+        invoker.addCommand(createTransactionCommand);
+        executeTransaction(transaction, invoker);
+        return transaction;
+    }
+
+    @Override
+    public Transaction executeTransaction(Transaction transaction, TransferInvoker invoker) {
+        System.out.println("TransactionServiceImpl executeTransaction"+invoker.getCommands().size());
+        invoker.addCommand(new UpdateAccountBalanceCommand(transaction, (t) -> {
+            try {
+                transactionDao.update(t);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        }));
+
         try {
-            bankAccountService.updateAccountBalance(transaction);
-            transaction.setTransactionStatus(TransactionStatus.SUCCESS);
+            invoker.executeSerially();
         } catch (Exception e) {
-            transaction.setTransactionStatus(TransactionStatus.FAILURE);
+            throw new RuntimeException(e);
         }
-        transaction.setEndedAt(new Timestamp(System.currentTimeMillis()));
-        transactionDao.update(transaction);
         return transaction;
     }
 
@@ -64,12 +81,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void updateTransactionStatus(Long transactionId, boolean status) throws Exception {
-        Optional<Transaction> transaction = transactionDao.findById(transactionId);
-        if (transaction.isPresent()) {
-            transaction.get().setTransactionStatus(TransactionStatus.SUCCESS);
-            transactionDao.update(transaction.get());
-        }
+    public void updateTransaction(Transaction transaction) throws Exception {
+        transactionDao.update(transaction);
     }
 
     @Override

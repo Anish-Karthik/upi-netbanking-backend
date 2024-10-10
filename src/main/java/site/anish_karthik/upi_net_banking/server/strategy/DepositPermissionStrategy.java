@@ -11,7 +11,7 @@ public class DepositPermissionStrategy implements PermissionStrategy {
     }
 
     @Override
-    public boolean canPerformAction() {
-        return permission.isCanDeposit();
+    public Boolean canPerformAction() {
+        return permission.getCanDeposit();
     }
 }

@@ -96,6 +96,7 @@ public class BankAccountServiceImpl implements BankAccountService {
         if (transaction.getTransactionType() == TransactionType.WITHDRAWAL) {
             amount = amount.negate();
         }
+        System.out.println("Updating account balance: " + transaction.getAccNo() + " by " + amount);
         bankAccountDao.updateAccountBalance(transaction.getAccNo(), amount);
     }
 

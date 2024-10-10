@@ -4,6 +4,8 @@ import site.anish_karthik.upi_net_banking.server.dao.TransactionDao;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionStatus;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
+import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
+import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,6 +14,8 @@ import java.util.Optional;
 
 public class TransactionDaoImpl implements TransactionDao {
     private final Connection connection;
+    private final String tableName = "transaction";
+    private final QueryBuilderUtil queryBuilderUtil = new QueryBuilderUtil();
 
     public TransactionDaoImpl(Connection connection) {
         this.connection = connection;
@@ -19,16 +23,13 @@ public class TransactionDaoImpl implements TransactionDao {
 
     @Override
     public Transaction save(Transaction transaction) {
-        String sql = "INSERT INTO transaction (user_id, acc_no, amount, transaction_type, transaction_status, by_card_no, upi_id, reference_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            setFields(transaction, stmt);
-            stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                transaction.setTransactionId(rs.getLong(1));
-            }
+        System.out.println("TransactionDaoImpl save"+transaction);
+        try {
+            QueryResult result = queryBuilderUtil.createInsertQuery(tableName, transaction);
+            Long id = queryBuilderUtil.executeDynamicQuery(connection, result, Long.class);
+            transaction.setTransactionId(id);
             return transaction;
-        } catch (SQLException e) {
+        } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -65,26 +66,13 @@ public class TransactionDaoImpl implements TransactionDao {
 
     @Override
     public Transaction update(Transaction transaction) {
-        String sql = "UPDATE transaction SET user_id = ?, acc_no = ?, amount = ?, transaction_type = ?, transaction_status = ?, by_card_no = ?, upi_id = ?, reference_id = ? WHERE transaction_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            setFields(transaction, stmt);
-            stmt.setLong(9, transaction.getTransactionId());
-            stmt.executeUpdate();
+        try {
+            QueryResult result = queryBuilderUtil.createUpdateQuery(tableName, transaction, "transaction_id", transaction.getTransactionId());
+            queryBuilderUtil.executeDynamicQuery(connection, result);
             return transaction;
-        } catch (SQLException e) {
+        } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void setFields(Transaction transaction, PreparedStatement stmt) throws SQLException {
-        stmt.setLong(1, transaction.getUserId());
-        stmt.setString(2, transaction.getAccNo());
-        stmt.setBigDecimal(3, transaction.getAmount());
-        stmt.setString(4, transaction.getTransactionType().name());
-        stmt.setString(5, transaction.getTransactionStatus().name());
-        stmt.setString(6, transaction.getByCardNo());
-        stmt.setString(7, transaction.getUpiId());
-        stmt.setString(8, transaction.getReferenceId());
     }
 
     @Override

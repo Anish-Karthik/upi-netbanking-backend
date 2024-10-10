@@ -4,10 +4,10 @@ import site.anish_karthik.upi_net_banking.server.model.Permission;
 
 public class PermissionUtil {
     public static void comparePermissions(Permission permission, Permission requiredPermission, String paymentMethod) throws Exception {
-        checkPermission(permission.isCanDeposit(), requiredPermission.isCanDeposit(), "deposit", paymentMethod);
-        checkPermission(permission.isCanWithdraw(), requiredPermission.isCanWithdraw(), "withdraw", paymentMethod);
-        checkPermission(permission.isCanSendMoney(), requiredPermission.isCanSendMoney(), "send money", paymentMethod);
-        checkPermission(permission.isCanReceiveMoney(), requiredPermission.isCanReceiveMoney(), "receive money", paymentMethod);
+        checkPermission(permission.getCanDeposit(), requiredPermission.getCanDeposit(), "deposit", paymentMethod);
+        checkPermission(permission.getCanWithdraw(), requiredPermission.getCanWithdraw(), "withdraw", paymentMethod);
+        checkPermission(permission.getCanSendMoney(), requiredPermission.getCanSendMoney(), "send money", paymentMethod);
+        checkPermission(permission.getCanReceiveMoney(), requiredPermission.getCanReceiveMoney(), "receive money", paymentMethod);
     }
 
     public static void checkPermission(boolean hasPermission, boolean requiresPermission, String action, String paymentMethod) throws Exception {

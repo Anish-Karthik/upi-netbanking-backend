@@ -90,11 +90,14 @@ public class QueryBuilderUtil {
      * @throws IllegalAccessException if the object's fields are not accessible
      */
     public QueryResult createSelectQuery(String tableName, Object obj) throws IllegalAccessException {
-        StringBuilder whereClause = new StringBuilder("SELECT * FROM ").append(tableName).append(" WHERE ");
+        StringBuilder whereClause = new StringBuilder("SELECT * FROM ").append(tableName);
         List<Object> params = new ArrayList<>();
         boolean firstCondition = true;
 
-        buildWhereClause(obj, whereClause, params, firstCondition);
+        if (obj != null) {
+            whereClause.append(" WHERE ");
+            buildWhereClause(obj, whereClause, params, firstCondition);
+        }
 
         whereClause.append(";");
         return new QueryResult(whereClause.toString(), params);  // Return query and parameters

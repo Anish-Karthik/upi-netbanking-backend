@@ -11,10 +11,10 @@ public class Permission {
     private String accNo;
     private String upiId;
     private String cardNo;
-    private boolean canDeposit;
-    private boolean canWithdraw;
-    private boolean canSendMoney;
-    private boolean canReceiveMoney;
+    private Boolean canDeposit;
+    private Boolean canWithdraw;
+    private Boolean canSendMoney;
+    private Boolean canReceiveMoney;
 
     public Permission(boolean canDeposit, boolean canWithdraw, boolean canSendMoney, boolean canReceiveMoney) {
         this.canDeposit = canDeposit;

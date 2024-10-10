@@ -11,7 +11,7 @@ public class SendMoneyPermissionStrategy implements PermissionStrategy {
     }
 
     @Override
-    public boolean canPerformAction() {
-        return permission.isCanSendMoney();
+    public Boolean canPerformAction() {
+        return permission.getCanSendMoney();
     }
 }

@@ -2,35 +2,27 @@ package site.anish_karthik.upi_net_banking.server.command.impl.transaction;
 
 import lombok.Getter;
 import site.anish_karthik.upi_net_banking.server.command.Command;
-import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionStatus;
 import site.anish_karthik.upi_net_banking.server.service.TransactionService;
 import site.anish_karthik.upi_net_banking.server.service.impl.TransactionServiceImpl;
 
-public class CreateTransactionCommand implements Command {
-    @Getter
-    private Transaction transaction;
+public class UpdateTransactionCommand implements Command {
+    private final Transaction transaction;
     private final TransactionService transactionService = new TransactionServiceImpl();
 
-    public CreateTransactionCommand(Transaction transaction) {
-        System.out.println("CreateTransactionCommand");
+    public UpdateTransactionCommand(Transaction transaction, TransactionStatus status) {
         this.transaction = transaction;
+        transaction.setTransactionStatus(status);
     }
 
     @Override
     public void execute() throws Exception {
-        System.out.println("CreateTransactionCommand execute");
-        transaction.setTransactionStatus(TransactionStatus.PROCESSING);
-        this.transaction = transactionService.createTransaction(transaction);
-        System.out.println("Transaction created: " + transaction);
+        transactionService.updateTransaction(transaction);
     }
 
     @Override
     public void undo() throws Exception {
-        transaction.setTransactionStatus(TransactionStatus.CANCELLED);
-        transactionService.updateTransaction(transaction);
     }
-
 }
 

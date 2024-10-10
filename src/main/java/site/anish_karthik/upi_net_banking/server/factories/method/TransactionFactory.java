@@ -34,6 +34,10 @@ public class TransactionFactory {
     }
 
     public TransactionStrategy getStrategy(Transaction.PaymentMethod paymentMethod, TransactionType transactionType, TransactionCategory transactionCategory) {
+        System.out.println("TransactionFactory.getStrategy");
+        System.out.println("paymentMethod = " + paymentMethod);
+        System.out.println("transactionType = " + transactionType);
+        System.out.println("transactionCategory = " + transactionCategory);
         TransactionStrategy strategy = strategyMap.get(new TransactionKey(paymentMethod, transactionType, transactionCategory));
         if (strategy == null) {
             throw new IllegalArgumentException("Invalid payment method, transaction type, or transaction category");

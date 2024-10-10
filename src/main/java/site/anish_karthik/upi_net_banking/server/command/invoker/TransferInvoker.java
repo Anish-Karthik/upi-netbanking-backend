@@ -1,14 +1,23 @@
 package site.anish_karthik.upi_net_banking.server.command.invoker;
 
+import lombok.Getter;
 import site.anish_karthik.upi_net_banking.server.command.Command;
+import site.anish_karthik.upi_net_banking.server.command.GeneralCommand;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-public class TransferInvoker extends GeneralInvoker {
+@Getter
+public class TransferInvoker implements Invoker<Command> {
     private final List<Command> commands = new ArrayList<>();
+
+    @Override
+    public void addCommand(Command command) {
+        System.out.println("HEY");
+        this.commands.add( command);
+    }
 
     @Override
     public void executeSerially() throws Exception {
@@ -21,6 +30,7 @@ public class TransferInvoker extends GeneralInvoker {
                 throw e;
             }
         }
+        commands.clear();
     }
 
     @Override
@@ -35,7 +45,7 @@ public class TransferInvoker extends GeneralInvoker {
                 }
             }));
         }
-
+        commands.clear();
         try {
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
         } catch (ExecutionException | InterruptedException e) {

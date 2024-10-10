@@ -10,7 +10,7 @@ public class WithdrawPermissionStrategy implements PermissionStrategy {
     }
 
     @Override
-    public boolean canPerformAction() {
-        return permission.isCanWithdraw();
+    public Boolean canPerformAction() {
+        return permission.getCanWithdraw();
     }
 }

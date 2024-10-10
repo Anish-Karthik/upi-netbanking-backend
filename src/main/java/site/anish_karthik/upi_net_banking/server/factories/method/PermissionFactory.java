@@ -34,6 +34,7 @@ public class PermissionFactory {
         if (permission == null) {
             throw new IllegalArgumentException(category.name() + " category and " + type.name() + " type not supported");
         }
+        System.out.println("category = " + category + "\ntype = " + type + "\npermission = " + permission);
         return permission;
     }
 }

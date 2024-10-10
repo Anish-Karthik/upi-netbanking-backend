@@ -1,5 +1,6 @@
 package site.anish_karthik.upi_net_banking.server.command.invoker;
 
+import lombok.Getter;
 import site.anish_karthik.upi_net_banking.server.command.GeneralCommand;
 
 import java.util.ArrayList;
@@ -7,11 +8,13 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-public class GeneralInvoker implements Invoker {
+@Getter
+public class GeneralInvoker implements Invoker<GeneralCommand> {
     private final List<GeneralCommand> commands = new ArrayList<>();
 
     @Override
     public void addCommand(GeneralCommand command) {
+
         this.commands.add(command);
     }
 
@@ -25,6 +28,7 @@ public class GeneralInvoker implements Invoker {
                 throw e;
             }
         }
+        commands.clear();
     }
 
     @Override
@@ -39,7 +43,7 @@ public class GeneralInvoker implements Invoker {
                 }
             }));
         }
-
+        commands.clear();
         try {
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
         } catch (ExecutionException | InterruptedException e) {
