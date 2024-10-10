@@ -18,7 +18,7 @@ public class PathParamExtractor {
      */
     public static <T> T extractPathParams(String path, String regex, Class<T> dtoClass) throws Exception {
         // Compile the provided regex pattern
-        Pattern pattern = Pattern.compile(regex);
+        Pattern pattern = Pattern.compile(regex+"/?");
         System.out.println(path + " " + regex);
         Matcher matcher = pattern.matcher(path);
 

@@ -29,6 +29,15 @@
     </filter-mapping>
 
     <filter>
+        <filter-name>AccountAuthorizationFilter</filter-name>
+        <filter-class>site.anish_karthik.upi_net_banking.server.filter.authorization.AccountsAuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AccountAuthorizationFilter</filter-name>
+        <url-pattern>/api/accounts/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
         <filter-name>UserValidationProfileFilter</filter-name>
         <filter-class>site.anish_karthik.upi_net_banking.server.filter.validator.UserProfileFilter</filter-class>
     </filter>

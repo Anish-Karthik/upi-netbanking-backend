@@ -36,10 +36,15 @@ public class TransactionRouter {
     }
 
     public void getTransactionById(HttpServletRequest req, HttpServletResponse resp) {
+        System.out.println("GET TRANSACTION BY ID");
         try {
-            PathParams params = PathParamExtractor.extractPathParams(req.getPathInfo(),"/(\\d+)/transactions/(\\d+)", PathParams.class);
-            Transaction transaction = transactionService.getTransactionById(params.getTransactionId());
-            if (transaction.getAccNo().equals(params.accNo)) {
+            String path = req.getPathInfo();
+            String accNo = PathParamExtractor.extractPathParams(path,"/(\\d+)/transactions.*", String.class);
+            Long transactionId = Long.parseLong(PathParamExtractor.extractPathParams(path, "/\\d+/transactions/(\\d+).*", String.class));
+            System.out.println(accNo + " " + transactionId);
+            Transaction transaction = transactionService.getTransactionById(transactionId);
+            System.out.println(transaction);
+            if (!transaction.getAccNo().equals(accNo)) {
                 ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_NOT_FOUND, "Transaction not found", null);
             }
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Transaction Found", transaction);

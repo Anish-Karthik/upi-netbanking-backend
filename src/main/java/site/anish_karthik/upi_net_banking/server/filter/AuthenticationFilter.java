@@ -1,5 +1,6 @@
 package site.anish_karthik.upi_net_banking.server.filter;
 
+import site.anish_karthik.upi_net_banking.server.dto.SessionUserDTO;
 import site.anish_karthik.upi_net_banking.server.model.User;
 
 import jakarta.servlet.*;
@@ -28,22 +29,26 @@ public class AuthenticationFilter implements Filter {
         // Check if there's a session
         HttpSession session = httpRequest.getSession(false);
 
-//        if (session != null && session.getAttribute("user") != null) {
-            // User is authenticated
+        if (session != null && session.getAttribute("user") != null) {
+//             User is authenticated
+            System.out.println("User is authenticated");
+            System.out.println(session.getAttribute("user"));
+            SessionUserDTO user = (SessionUserDTO) session.getAttribute("user");
+            httpRequest.setAttribute("user", user);
             chain.doFilter(request, response);
-//        } else {
-//            // Check if SESSIONID cookie is present
-//            Optional<Cookie> sessionCookie = getSessionCookie(httpRequest);
-//
-//            if (sessionCookie.isPresent() && session != null) {
-//                // If session cookie exists, but session is invalid, invalidate it
-//                session.invalidate();
-//            }
-//
-//            // Redirect to login page if the user is not authenticated
-//            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            httpResponse.getWriter().write("Unauthorized. Please login.");
-//        }
+        } else {
+            // Check if SESSIONID cookie is present
+            Optional<Cookie> sessionCookie = getSessionCookie(httpRequest);
+
+            if (sessionCookie.isPresent() && session != null) {
+                // If session cookie exists, but session is invalid, invalidate it
+                session.invalidate();
+            }
+
+            // Redirect to login page if the user is not authenticated
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            httpResponse.getWriter().write("Unauthorized. Please login.");
+        }
     }
 
     @Override
