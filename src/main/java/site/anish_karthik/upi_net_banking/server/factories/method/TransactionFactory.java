@@ -5,6 +5,12 @@ import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 import site.anish_karthik.upi_net_banking.server.strategy.transactions.*;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
+import site.anish_karthik.upi_net_banking.server.strategy.transactions.accounts.AccountDeposit;
+import site.anish_karthik.upi_net_banking.server.strategy.transactions.accounts.AccountWithdrawal;
+import site.anish_karthik.upi_net_banking.server.strategy.transactions.accounts.cards.CardDeposit;
+import site.anish_karthik.upi_net_banking.server.strategy.transactions.accounts.cards.CardWithdrawal;
+import site.anish_karthik.upi_net_banking.server.strategy.transactions.accounts.upi.UPIDeposit;
+import site.anish_karthik.upi_net_banking.server.strategy.transactions.accounts.upi.UPIWithdrawal;
 
 import java.util.HashMap;
 import java.util.Map;

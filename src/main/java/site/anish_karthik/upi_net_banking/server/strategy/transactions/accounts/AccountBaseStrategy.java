@@ -1,4 +1,4 @@
-package site.anish_karthik.upi_net_banking.server.strategy.transactions;
+package site.anish_karthik.upi_net_banking.server.strategy.transactions.accounts;
 
 import site.anish_karthik.upi_net_banking.server.command.GeneralCommand;
 import site.anish_karthik.upi_net_banking.server.command.impl.validation.permission.AccountPermissionCommand;
@@ -8,6 +8,7 @@ import site.anish_karthik.upi_net_banking.server.model.Permission;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
+import site.anish_karthik.upi_net_banking.server.strategy.transactions.TransactionStrategyImpl;
 
 import java.util.List;
 

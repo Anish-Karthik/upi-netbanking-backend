@@ -1,13 +1,9 @@
 package site.anish_karthik.upi_net_banking.server.strategy.transactions;
 
 import lombok.Getter;
-import site.anish_karthik.upi_net_banking.server.command.Command;
 import site.anish_karthik.upi_net_banking.server.command.GeneralCommand;
-import site.anish_karthik.upi_net_banking.server.command.impl.validation.permission.AccountPermissionCommand;
-import site.anish_karthik.upi_net_banking.server.command.impl.validation.status.AccountValidateStatusCommand;
 import site.anish_karthik.upi_net_banking.server.command.invoker.GeneralInvoker;
 import site.anish_karthik.upi_net_banking.server.factories.method.PermissionFactory;
-import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Permission;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory;

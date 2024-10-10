@@ -1,6 +1,5 @@
-package site.anish_karthik.upi_net_banking.server.strategy.transactions;
+package site.anish_karthik.upi_net_banking.server.strategy.transactions.accounts.upi;
 
-import site.anish_karthik.upi_net_banking.server.command.Command;
 import site.anish_karthik.upi_net_banking.server.command.GeneralCommand;
 import site.anish_karthik.upi_net_banking.server.command.impl.validation.permission.UpiPermissionCommand;
 import site.anish_karthik.upi_net_banking.server.command.impl.validation.status.UpiValidateStatusCommand;
@@ -13,17 +12,13 @@ import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.UpiService;
 import site.anish_karthik.upi_net_banking.server.service.impl.UpiServiceImpl;
+import site.anish_karthik.upi_net_banking.server.strategy.transactions.accounts.AccountBaseStrategy;
 
-import java.util.function.Function;
-
-public class UPIDeposit implements TransactionStrategy {
-    private final BankAccountService bankAccountService;
+public class UpiBaseStrategy extends AccountBaseStrategy {
     private final UpiService upiService;
-    private final TransactionCategory transactionCategory; // SOLO or TRANSFER
 
-    public UPIDeposit(BankAccountService bankAccountService, TransactionCategory transactionCategory) {
-        this.bankAccountService = bankAccountService;
-        this.transactionCategory = transactionCategory;
+    public UpiBaseStrategy(BankAccountService bankAccountService, TransactionCategory transactionCategory) {
+        super(bankAccountService, transactionCategory);
         try {
             this.upiService = new UpiServiceImpl();
         } catch (Exception e) {
@@ -33,7 +28,7 @@ public class UPIDeposit implements TransactionStrategy {
 
     @Override
     public Transaction prepareTransaction(Transaction transaction) throws Exception {
-        Permission permission = PermissionFactory.getPermission(transactionCategory, transaction.getTransactionType());
+        Permission permission = PermissionFactory.getPermission(getTransactionCategory(), transaction.getTransactionType());
         GeneralInvoker invoker = getGeneralInvoker(transaction, permission);
         try {
             invoker.executeInParallel();
@@ -59,17 +54,5 @@ public class UPIDeposit implements TransactionStrategy {
         };
         invoker.addCommand(fetchBankAccountCommand);
         return invoker;
-    }
-
-    @Override
-    public void execute(Transaction transaction) throws Exception {
-        prepareTransaction(transaction);
-        bankAccountService.deposit(transaction);
-    }
-
-    @Override
-    public Transaction execute(Transaction transaction, Function<Transaction, Transaction> handle) throws Exception {
-        prepareTransaction(transaction);
-        return handle.apply(transaction);
     }
 }
