@@ -29,8 +29,6 @@ public class TransferRouter {
         router.post("/", this::makeTransfer);
         router.get("/", this::getTransfers);
         router.get("/:refId", this::getTransfer);
-
-        System.out.println(router.getPostRoutes());
     }
 
     private void makeTransfer(HttpServletRequest req, HttpServletResponse resp) {

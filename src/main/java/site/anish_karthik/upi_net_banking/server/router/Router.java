@@ -3,65 +3,49 @@ package site.anish_karthik.upi_net_banking.server.router;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Router {
-    private List<Route> getRoutes = new ArrayList<>();
-    private List<Route> postRoutes = new ArrayList<>();
-    private List<Route> putRoutes = new ArrayList<>();
-    private List<Route> patchRoutes = new ArrayList<>();
-    private List<Route> deleteRoutes = new ArrayList<>();
+    private Map<String, Map<Pattern, BiConsumer<HttpServletRequest, HttpServletResponse>>> routes = new HashMap<>();
     private String pathPrefix;
 
     public Router(String pathPrefix) {
         this.pathPrefix = pathPrefix;
     }
 
-    @Data
-    private static class Route {
-        private Pattern pattern;
-        private BiConsumer<HttpServletRequest, HttpServletResponse>     handler;
-
-        public Route(Pattern pattern, BiConsumer<HttpServletRequest, HttpServletResponse> handler) {
-            this.pattern = pattern;
-            this.handler = handler;
-        }
-    }
-
     public void get(String path, BiConsumer<HttpServletRequest, HttpServletResponse> handler) {
-        Pattern pattern = Pattern.compile(convertToRegex(path));
-        getRoutes.add(new Route(pattern, handler));
+        addRoute("GET", path, handler);
     }
 
     public void post(String path, BiConsumer<HttpServletRequest, HttpServletResponse> handler) {
-        Pattern pattern = Pattern.compile(convertToRegex(path));
-        postRoutes.add(new Route(pattern, handler));
+        addRoute("POST", path, handler);
     }
 
     public void put(String path, BiConsumer<HttpServletRequest, HttpServletResponse> handler) {
-        Pattern pattern = Pattern.compile(convertToRegex(path));
-        putRoutes.add(new Route(pattern, handler));
+        addRoute("PUT", path, handler);
     }
 
     public void patch(String path, BiConsumer<HttpServletRequest, HttpServletResponse> handler) {
-        Pattern pattern = Pattern.compile(convertToRegex(path));
-        patchRoutes.add(new Route(pattern, handler));
+        addRoute("PATCH", path, handler);
     }
 
     public void delete(String path, BiConsumer<HttpServletRequest, HttpServletResponse> handler) {
+        addRoute("DELETE", path, handler);
+    }
+
+    private void addRoute(String method, String path, BiConsumer<HttpServletRequest, HttpServletResponse> handler) {
         Pattern pattern = Pattern.compile(convertToRegex(path));
-        deleteRoutes.add(new Route(pattern, handler));
+        routes.computeIfAbsent(method, k -> new HashMap<>()).put(pattern, handler);
     }
 
     private String convertToRegex(String path) {
@@ -69,37 +53,21 @@ public class Router {
     }
 
     public void handle(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String method = req.getMethod();
+        String method = req.getMethod().toUpperCase();
         String path = req.getRequestURI();
-        List<Route> routes;
+        Map<Pattern, BiConsumer<HttpServletRequest, HttpServletResponse>> methodRoutes = routes.get(method);
 
-        switch (method.toUpperCase()) {
-            case "GET":
-                routes = getRoutes;
-                break;
-            case "POST":
-                routes = postRoutes;
-                break;
-            case "PUT":
-                routes = putRoutes;
-                break;
-            case "PATCH":
-                routes = patchRoutes;
-                break;
-            case "DELETE":
-                routes = deleteRoutes;
-                break;
-            default:
-                resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Method not allowed");
-                return;
+        if (methodRoutes == null) {
+            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Method not allowed");
+            return;
         }
 
-        for (Route route : routes) {
-            Matcher matcher = route.getPattern().matcher(path);
+        for (Map.Entry<Pattern, BiConsumer<HttpServletRequest, HttpServletResponse>> entry : methodRoutes.entrySet()) {
+            Matcher matcher = entry.getKey().matcher(path);
             if (matcher.matches()) {
-                Map<String, String> params = extractParams(route.getPattern(), path);
+                Map<String, String> params = extractParams(entry.getKey(), path);
                 req.setAttribute("routeParams", params);
-                route.getHandler().accept(req, resp);
+                entry.getValue().accept(req, resp);
                 return;
             }
         }
