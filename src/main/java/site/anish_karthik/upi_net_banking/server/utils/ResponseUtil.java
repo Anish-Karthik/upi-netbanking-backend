@@ -13,27 +13,39 @@ public class ResponseUtil {
 
     public static void sendResponse(HttpServletRequest request, HttpServletResponse response, int statusCode,
             String message, Object data) throws IOException {
+        ApiResponse apiResponse = prepareResponse(statusCode, message, data);
+        sendResponse(request, response, apiResponse);
+    }
+
+    public static void sendResponse(HttpServletRequest request, HttpServletResponse response, ApiResponse apiResponse) throws IOException {
         String acceptHeader = request.getHeader("Accept");
-         if (acceptHeader == null || acceptHeader.contains("text/html")) {
+
+        if (acceptHeader == null || acceptHeader.contains("text/html")) {
             response.setContentType("text/plain");
-            response.setStatus(statusCode);
-            response.getWriter().write(message + ": " + Objects.requireNonNullElseGet(data, Object::new));
+            response.setStatus(apiResponse.getStatus());
+            response.getWriter().write(apiResponse.getMessage() + ": " + Objects.requireNonNullElseGet(apiResponse.getData(), Object::new));
         } else if (acceptHeader.contains("application/json") || acceptHeader.contains("*/*")) {
-             response.setContentType("application/json");
-             response.setStatus(statusCode);
-             var responseBuilder = ApiResponse.builder().status(statusCode).message(message);
-             if (data != null) responseBuilder.data(data);
-            response.getWriter().write(JsonParser.toJson(responseBuilder.build()));
-         } else {
+            response.setContentType("application/json");
+            response.setStatus(apiResponse.getStatus());
+            response.getWriter().write(JsonParser.toJson(apiResponse));
+        } else {
             response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
             response.getWriter().write("Not acceptable");
         }
     }
 
+    public static ApiResponse prepareResponse(int statusCode, String message, Object data) {
+        return ApiResponse.builder()
+                .status(statusCode)
+                .message(message)
+                .data(data)
+                .build();
+    }
+
     @AllArgsConstructor
     @Builder
     @Data
-    private static class ApiResponse {
+    public static class ApiResponse {
         private int status;
         private String message;
         private Object data;

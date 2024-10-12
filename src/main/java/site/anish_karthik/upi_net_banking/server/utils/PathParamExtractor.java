@@ -1,6 +1,8 @@
 package site.anish_karthik.upi_net_banking.server.utils;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +32,7 @@ public class PathParamExtractor {
             }
 
             // Create an instance of the DTO class
-            System.out.println("I'm in extractPathParams" + matcher.toString());
+            System.out.println("I'm in extractPathParams" + matcher);
             T paramsObject = dtoClass.getDeclaredConstructor().newInstance();
 
             // Get all fields from the DTO class

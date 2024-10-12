@@ -1,10 +1,8 @@
-package site.anish_karthik.upi_net_banking.server.filter;
+package site.anish_karthik.upi_net_banking.server.filter.authorization;
 
 import site.anish_karthik.upi_net_banking.server.dto.SessionUserDTO;
-import site.anish_karthik.upi_net_banking.server.model.User;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
