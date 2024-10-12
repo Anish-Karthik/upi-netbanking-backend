@@ -4,7 +4,6 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.dto.UserProfileDTO;
-import site.anish_karthik.upi_net_banking.server.utils.CachedBodyHttpServletRequest;
 import site.anish_karthik.upi_net_banking.server.utils.HttpRequestParser;
 import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 
@@ -28,9 +27,7 @@ public class UserProfileFilter implements Filter {
         System.out.println("HEY I'm Profile filter");
 
         if ("PUT".equals(method)) {
-            CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(httpRequest);
-            // Validate PUT /users/{user_id}
-            validateUpdateUserProfileRequest(cachedRequest, httpResponse, chain);
+            validateUpdateUserProfileRequest(httpRequest, httpResponse, chain);
         } else {
             // handle get requests
             chain.doFilter(request, response);

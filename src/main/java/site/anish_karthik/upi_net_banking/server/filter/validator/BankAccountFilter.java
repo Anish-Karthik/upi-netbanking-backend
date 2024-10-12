@@ -5,15 +5,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.dto.CreateBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.dto.UpdateBankAccountDTO;
-import site.anish_karthik.upi_net_banking.server.utils.CachedBodyHttpServletRequest;
 import site.anish_karthik.upi_net_banking.server.utils.HttpRequestParser;
 import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.validator.Validator;
 import site.anish_karthik.upi_net_banking.server.utils.validator.ValidatorBuilder;
-
 import java.io.IOException;
 
-//@WebFilter(urlPatterns = {"/api/user/*"})
 public class BankAccountFilter implements Filter {
 
     @Override
@@ -28,15 +25,14 @@ public class BankAccountFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
-        CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(httpRequest);
         System.out.println("HEY I'm A filter: BankAccountFilter");
         if (pathInfo.matches("/\\d+/accounts/\\d+/\\S+") &&pathInfo.endsWith("/reopen") || pathInfo.endsWith("/close")) {
             chain.doFilter(request, response);
         } else if (pathInfo.matches("/\\d+/accounts/?(\\d+)?")) {
             if ("POST".equals(method)) {
-                validateCreateBankAccountRequest(cachedRequest, httpResponse, chain);
+                validateCreateBankAccountRequest(httpRequest, httpResponse, chain);
             } else if ("PUT".equals(method)) {
-                validateUpdateBankAccountRequest(cachedRequest, httpResponse, chain);
+                validateUpdateBankAccountRequest(httpRequest, httpResponse, chain);
             } else {
                 chain.doFilter(request, response);
             }

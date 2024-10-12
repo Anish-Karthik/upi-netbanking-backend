@@ -1,14 +1,9 @@
 package site.anish_karthik.upi_net_banking.server.filter;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import site.anish_karthik.upi_net_banking.server.utils.CachedBodyHttpServletRequest;
 
 import java.io.IOException;
 
@@ -47,9 +42,9 @@ public class CORSInterceptor implements Filter {
                 return;
             }
         }
-
+        CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
         // pass the request along the filter chain
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(cachedRequest, response);
     }
 
     private boolean isAllowedOrigin(String origin) {

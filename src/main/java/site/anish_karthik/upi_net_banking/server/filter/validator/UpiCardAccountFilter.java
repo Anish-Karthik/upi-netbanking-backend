@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.dto.AccountStatusDTO;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.impl.BankAccountServiceImpl;
-import site.anish_karthik.upi_net_banking.server.utils.CachedBodyHttpServletRequest;
 import site.anish_karthik.upi_net_banking.server.utils.PathParamExtractor;
 import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 
@@ -34,7 +33,6 @@ public class UpiCardAccountFilter implements Filter {
             return;
         }
         System.out.printf("HEY I'm A filter: UpiCardAccountFilter %s %s\n", method, pathInfo);
-        CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(httpRequest);
         try {
             String accNo = PathParamExtractor.extractPathParams(pathInfo, "/(\\d+)/.*", String.class);
             if (pathInfo.matches("/\\d+/\\S+")) {
@@ -42,7 +40,7 @@ public class UpiCardAccountFilter implements Filter {
                 System.out.printf("HEY I'm A filter: UpiCardAccountFilter %s %s\n",accNo, paymentMode);
                 AccountStatusDTO accountStatusDTO = AccountStatusDTO.fromBankAccount(accountService.getBankAccountByAccNo(accNo));
                 if (accountStatusDTO != null && !method.equals("GET") && "CLOSED".equalsIgnoreCase(accountStatusDTO.getStatus().name())) {
-                    ResponseUtil.sendResponse(cachedRequest, httpResponse, HttpServletResponse.SC_BAD_REQUEST, "Account is closed, hence won't be able to manipulate " + paymentMode + " or other supported payment methods linked with account", null);
+                    ResponseUtil.sendResponse(httpRequest, httpResponse, HttpServletResponse.SC_BAD_REQUEST, "Account is closed, hence won't be able to manipulate " + paymentMode + " or other supported payment methods linked with account", null);
                 } else {
                     chain.doFilter(request, response);
                 }
