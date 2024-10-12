@@ -2,11 +2,13 @@ package site.anish_karthik.upi_net_banking.server.filter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import site.anish_karthik.upi_net_banking.server.dto.SessionUserDTO;
 import site.anish_karthik.upi_net_banking.server.exception.ApiResponseException;
 import site.anish_karthik.upi_net_banking.server.router.FilterRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
 public class BaseFilterModule {
@@ -35,5 +37,15 @@ public class BaseFilterModule {
 
     public void applyFilters(String method, String path, HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ApiResponseException {
         filterRegistry.applyFilter(method, path, httpRequest, httpResponse);
+    }
+
+    public static void authenticatePostRequest(String accNo, SessionUserDTO user, String accNo2, Long userId2) {
+        Long userId = user.getId();
+        if (!Objects.equals(accNo2, accNo)) {
+            throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+        }
+        if (!Objects.equals(userId2, userId)) {
+            throw new ApiResponseException(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        }
     }
 }

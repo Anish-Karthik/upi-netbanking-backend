@@ -4,10 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.dao.UpiDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.UpiDaoImpl;
+import site.anish_karthik.upi_net_banking.server.dto.CreateUpiDTO;
+import site.anish_karthik.upi_net_banking.server.dto.SessionUserDTO;
 import site.anish_karthik.upi_net_banking.server.exception.ApiResponseException;
 import site.anish_karthik.upi_net_banking.server.filter.BaseFilterModule;
 import site.anish_karthik.upi_net_banking.server.filter.FilterModule;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
+import site.anish_karthik.upi_net_banking.server.utils.HttpRequestParser;
 import site.anish_karthik.upi_net_banking.server.utils.PathParamExtractor;
 
 import java.util.Optional;
@@ -15,10 +18,12 @@ import java.util.Optional;
 public class UPIFilterModule extends BaseFilterModule implements FilterModule {
     private final UpiDao upiDao;
     private String path;
+    private SessionUserDTO user;
 
     public UPIFilterModule() {
         upiDao = new UpiDaoImpl();
         registerCommonFilter("/\\d+/upi/\\S+.*", this::commonFilter);
+        registerMethodFilter("POST", "/\\d+/upi/?", this::createUpiFilter);
     }
 
     @Override
@@ -26,6 +31,7 @@ public class UPIFilterModule extends BaseFilterModule implements FilterModule {
         System.out.println("HEY I'm A UPI authorization filter::2");
         path = httpRequest.getPathInfo();
         String method = httpRequest.getMethod();
+        user = (SessionUserDTO) httpRequest.getAttribute("user");
 
         applyFilters(method, path, httpRequest, httpResponse);
     }
@@ -43,6 +49,17 @@ public class UPIFilterModule extends BaseFilterModule implements FilterModule {
             System.out.println("HEY I'm A UPI authorization filter:: success");
         } catch (ApiResponseException ae) {
             throw ae;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void createUpiFilter(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ApiResponseException {
+        try {
+            System.out.println("HEY I'm A Create UPI authorization filter");
+            CreateUpiDTO createUpiDTO = HttpRequestParser.parse(httpRequest, CreateUpiDTO.class);
+            String accNo = PathParamExtractor.extractPathParams(path, "/(\\d+)/upi.*", String.class);
+            authenticatePostRequest(accNo, user, createUpiDTO.getAccNo(), createUpiDTO.getUserId());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
