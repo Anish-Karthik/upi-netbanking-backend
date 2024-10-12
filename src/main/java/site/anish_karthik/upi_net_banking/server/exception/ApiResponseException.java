@@ -1,11 +1,13 @@
 package site.anish_karthik.upi_net_banking.server.exception;
 
-import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil.ApiResponse;
+import lombok.Getter;
+import site.anish_karthik.upi_net_banking.server.utils.ApiResponse;
 
+@Getter
 public class ApiResponseException extends RuntimeException {
-    private final ApiResponse apiResponse;
+    private final ApiResponse<Object> apiResponse;
 
-    public ApiResponseException(ApiResponse apiResponse) {
+    public ApiResponseException(ApiResponse<Object> apiResponse) {
         super(apiResponse.getMessage());
         this.apiResponse = apiResponse;
     }
@@ -13,10 +15,6 @@ public class ApiResponseException extends RuntimeException {
     public ApiResponseException(int statusCode, String message) {
         super(message);
         this.apiResponse = ApiResponse.builder().message(message).status(statusCode).build();
-    }
-
-    public ApiResponse getApiResponse() {
-        return apiResponse;
     }
 
     public int getStatusCode() {

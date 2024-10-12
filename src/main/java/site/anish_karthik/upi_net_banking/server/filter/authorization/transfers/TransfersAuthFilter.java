@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.dto.SessionUserDTO;
 import site.anish_karthik.upi_net_banking.server.exception.ApiResponseException;
+import site.anish_karthik.upi_net_banking.server.utils.CustomResponseWrapper;
 import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 import java.io.IOException;
 
@@ -24,7 +25,13 @@ public class TransfersAuthFilter implements Filter {
 
         try {
             new TransferFilterModule().handle(httpRequest, httpResponse);
-            chain.doFilter(request, response);
+            // Wrap the response to capture the servlet output
+            CustomResponseWrapper responseWrapper = new CustomResponseWrapper(httpResponse);
+
+            chain.doFilter(request, responseWrapper);
+
+
+            new TransferResponseFilterModule().handle(httpRequest, responseWrapper);
         } catch (ApiResponseException ae) {
             System.out.println("Error: " + ae.getApiResponse());
             ResponseUtil.sendResponse(httpRequest, httpResponse, ae.getApiResponse());

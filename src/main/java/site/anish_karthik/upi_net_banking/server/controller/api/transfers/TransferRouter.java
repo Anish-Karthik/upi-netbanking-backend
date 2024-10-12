@@ -57,7 +57,7 @@ public class TransferRouter {
 
     private void getTransfers(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            List<BankTransfer> res = transferService.getTransfers();
+            List<GetTransferDTO> res = transferService.getTransfers();
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Transfers found", res);
         } catch (IOException e) {
             handleException(req, resp, e);

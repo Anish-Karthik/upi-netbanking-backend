@@ -15,6 +15,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class TransferDaoImpl implements TransferDao {
     private final Connection connection;
@@ -103,6 +105,21 @@ public class TransferDaoImpl implements TransferDao {
         } catch (Exception e) {
             throw new RuntimeException("Error finding all bank transfers", e);
         }
+    }
+
+    @Override
+    public List<GetTransferDTO> getAllDetailedTransfers() {
+        List<BankTransfer> transfers = findAll();
+        List<CompletableFuture<GetTransferDTO>> futures = transfers.stream()
+                .map(transfer -> CompletableFuture.supplyAsync(() -> getDetailedTransfer(transfer.getReferenceId())))
+                .toList();
+
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+        return allOf.thenApply(v -> futures.stream()
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList()))
+                .join();
     }
 
     @Override

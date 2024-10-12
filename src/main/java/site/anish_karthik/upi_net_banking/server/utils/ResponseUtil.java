@@ -13,7 +13,7 @@ public class ResponseUtil {
 
     public static void sendResponse(HttpServletRequest request, HttpServletResponse response, int statusCode,
             String message, Object data) throws IOException {
-        ApiResponse apiResponse = prepareResponse(statusCode, message, data);
+        ApiResponse<Object> apiResponse = prepareResponse(statusCode, message, data);
         sendResponse(request, response, apiResponse);
     }
 
@@ -34,20 +34,11 @@ public class ResponseUtil {
         }
     }
 
-    public static ApiResponse prepareResponse(int statusCode, String message, Object data) {
+    public static ApiResponse<Object> prepareResponse(int statusCode, String message, Object data) {
         return ApiResponse.builder()
                 .status(statusCode)
                 .message(message)
                 .data(data)
                 .build();
-    }
-
-    @AllArgsConstructor
-    @Builder
-    @Data
-    public static class ApiResponse {
-        private int status;
-        private String message;
-        private Object data;
     }
 }

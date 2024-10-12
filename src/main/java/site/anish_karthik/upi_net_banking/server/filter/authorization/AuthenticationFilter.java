@@ -21,29 +21,29 @@ public class AuthenticationFilter implements Filter {
         System.out.println("HEY I'm A auth filter");
         // Check if there's a session
         HttpSession session = httpRequest.getSession(false);
-//        httpRequest.setAttribute("user", new SessionUserDTO(1L, "anish", "anish@example.com", "1234567890"));
-//        chain.doFilter(request, response);
+        httpRequest.setAttribute("user", new SessionUserDTO(1L, "anish", "anish@example.com", "1234567890"));
+        chain.doFilter(request, response);
 
-        if (session != null && session.getAttribute("user") != null) {
-//             User is authenticated
-            System.out.println("User is authenticated");
-            System.out.println(session.getAttribute("user"));
-            SessionUserDTO user = (SessionUserDTO) session.getAttribute("user");
-            httpRequest.setAttribute("user", user);
-            chain.doFilter(request, response);
-        } else {
-            // Check if SESSIONID cookie is present
-            Optional<Cookie> sessionCookie = getSessionCookie(httpRequest);
-
-            if (sessionCookie.isPresent() && session != null) {
-                // If session cookie exists, but session is invalid, invalidate it
-                session.invalidate();
-            }
-
-            // Redirect to login page if the user is not authenticated
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            httpResponse.getWriter().write("Unauthorized. Please login.");
-        }
+//        if (session != null && session.getAttribute("user") != null) {
+////             User is authenticated
+//            System.out.println("User is authenticated");
+//            System.out.println(session.getAttribute("user"));
+//            SessionUserDTO user = (SessionUserDTO) session.getAttribute("user");
+//            httpRequest.setAttribute("user", user);
+//            chain.doFilter(request, response);
+//        } else {
+//            // Check if SESSIONID cookie is present
+//            Optional<Cookie> sessionCookie = getSessionCookie(httpRequest);
+//
+//            if (sessionCookie.isPresent() && session != null) {
+//                // If session cookie exists, but session is invalid, invalidate it
+//                session.invalidate();
+//            }
+//
+//            // Redirect to login page if the user is not authenticated
+//            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            httpResponse.getWriter().write("Unauthorized. Please login.");
+//        }
     }
 
     private Optional<Cookie> getSessionCookie(HttpServletRequest request) {

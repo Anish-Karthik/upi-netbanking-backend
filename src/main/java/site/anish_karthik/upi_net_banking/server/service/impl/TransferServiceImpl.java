@@ -86,8 +86,8 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public List<BankTransfer> getTransfers() {
-        return transferDao.findAll();
+    public List<GetTransferDTO> getTransfers() {
+        return transferDao.getAllDetailedTransfers();
     }
 
     private void prepareTransactions(Transaction payerTransaction, Transaction payeeTransaction,

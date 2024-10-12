@@ -9,5 +9,5 @@ import java.util.List;
 public interface TransferService {
     GetTransferDTO handleTransfer(CreateTransferDTO transferDTO);
     GetTransferDTO getTransfer(String transferId);
-    List<BankTransfer> getTransfers();
+    List<GetTransferDTO> getTransfers();
 }
