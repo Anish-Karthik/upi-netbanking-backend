@@ -21,8 +21,8 @@ public class AuthenticationFilter implements Filter {
         System.out.println("HEY I'm A auth filter");
         // Check if there's a session
         HttpSession session = httpRequest.getSession(false);
-        httpRequest.setAttribute("user", new SessionUserDTO(1L, "anish", "anish@example.com", "1234567890"));
-        chain.doFilter(request, response);
+//        httpRequest.setAttribute("user", new SessionUserDTO(1L, "anish", "anish@example.com", "1234567890"));
+//        chain.doFilter(request, response);
 
         if (session != null && session.getAttribute("user") != null) {
 //             User is authenticated
