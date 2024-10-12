@@ -17,10 +17,15 @@ public class BeneficiaryDaoImpl implements BeneficiaryDao {
     private final Connection connection;
     private final QueryBuilderUtil queryBuilderUtil = new QueryBuilderUtil();
 
-    public BeneficiaryDaoImpl() throws Exception {
+    public BeneficiaryDaoImpl() {
         // Initialize the connection (assuming a DataSource is available)
-        this.connection = DatabaseUtil.getConnection();
+        try {
+            this.connection = DatabaseUtil.getConnection();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to establish connection to database");
+        }
     }
+
 
     @Override
     public Beneficiary findById(Long id) throws Exception {
