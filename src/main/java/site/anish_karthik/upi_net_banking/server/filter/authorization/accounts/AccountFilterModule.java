@@ -12,10 +12,8 @@ import site.anish_karthik.upi_net_banking.server.filter.authorization.accounts.c
 import site.anish_karthik.upi_net_banking.server.filter.authorization.accounts.transaction.TransactionFilterModule;
 import site.anish_karthik.upi_net_banking.server.filter.authorization.accounts.upi.UPIFilterModule;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
-import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.PathParamExtractor;
 
-import java.sql.SQLException;
 import java.util.Optional;
 
 public class AccountFilterModule extends BaseFilterModule implements FilterModule {
@@ -23,11 +21,8 @@ public class AccountFilterModule extends BaseFilterModule implements FilterModul
     private String path;
 
     public AccountFilterModule() {
-        try {
-            bankAccountDao = new BankAccountDaoImpl(DatabaseUtil.getConnection());
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        bankAccountDao = new BankAccountDaoImpl();
+
         registerNestedFilter("/\\d+/upi.*", new UPIFilterModule());
         registerNestedFilter("/\\d+/card.*", new CardFilterModule());
         registerNestedFilter("/\\d+/transactions.*", new TransactionFilterModule());

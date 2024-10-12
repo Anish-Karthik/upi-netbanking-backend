@@ -3,6 +3,7 @@ package site.anish_karthik.upi_net_banking.server.dao.impl;
 import site.anish_karthik.upi_net_banking.server.dao.CardDao;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Card;
+import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
@@ -18,6 +19,14 @@ public class CardDaoImpl implements CardDao {
 
     public CardDaoImpl(Connection connection) {
         this.connection = connection;
+    }
+
+    public CardDaoImpl() {
+        try {
+            connection = DatabaseUtil.getConnection();
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

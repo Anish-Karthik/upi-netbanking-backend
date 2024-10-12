@@ -8,10 +8,8 @@ import site.anish_karthik.upi_net_banking.server.exception.ApiResponseException;
 import site.anish_karthik.upi_net_banking.server.filter.BaseFilterModule;
 import site.anish_karthik.upi_net_banking.server.filter.FilterModule;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
-import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.PathParamExtractor;
 
-import java.sql.SQLException;
 import java.util.Optional;
 
 public class UPIFilterModule extends BaseFilterModule implements FilterModule {
@@ -19,11 +17,7 @@ public class UPIFilterModule extends BaseFilterModule implements FilterModule {
     private String path;
 
     public UPIFilterModule() {
-        try {
-            upiDao = new UpiDaoImpl(DatabaseUtil.getConnection());
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        upiDao = new UpiDaoImpl();
         registerCommonFilter("/\\d+/upi/\\S+.*", this::commonFilter);
     }
 

@@ -6,6 +6,7 @@ import site.anish_karthik.upi_net_banking.server.model.Bank;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.enums.AccountStatus;
 import site.anish_karthik.upi_net_banking.server.model.enums.AccountType;
+import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
@@ -22,6 +23,14 @@ public class BankAccountDaoImpl implements BankAccountDao {
 
     public BankAccountDaoImpl(Connection connection) {
         this.connection = connection;
+    }
+
+    public BankAccountDaoImpl() {
+        try {
+            connection = DatabaseUtil.getConnection();
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

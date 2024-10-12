@@ -3,6 +3,7 @@ package site.anish_karthik.upi_net_banking.server.dao.impl;
 import site.anish_karthik.upi_net_banking.server.dao.UpiDao;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
+import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
@@ -15,8 +16,17 @@ import java.util.Optional;
 public class UpiDaoImpl implements UpiDao {
     private final Connection connection;
     private final QueryBuilderUtil queryBuilderUtil = new QueryBuilderUtil();
+
     public UpiDaoImpl(Connection connection) {
         this.connection = connection;
+    }
+
+    public UpiDaoImpl() {
+        try {
+            connection = DatabaseUtil.getConnection();
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

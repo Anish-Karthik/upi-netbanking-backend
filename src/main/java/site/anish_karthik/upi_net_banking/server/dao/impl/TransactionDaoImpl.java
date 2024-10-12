@@ -4,6 +4,7 @@ import site.anish_karthik.upi_net_banking.server.dao.TransactionDao;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionStatus;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
+import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 
@@ -19,6 +20,14 @@ public class TransactionDaoImpl implements TransactionDao {
 
     public TransactionDaoImpl(Connection connection) {
         this.connection = connection;
+    }
+
+    public TransactionDaoImpl() {
+        try {
+            connection = DatabaseUtil.getConnection();
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
