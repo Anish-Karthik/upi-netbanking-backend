@@ -28,6 +28,7 @@ public class UserFilterModule extends BaseFilterModule implements FilterModule {
         user = (SessionUserDTO) httpRequest.getAttribute("user");
 
         applyFilters(method, path, httpRequest, httpResponse);
+        applyNestedFilters(httpRequest, httpResponse, path);
     }
 
     public void commonFilter(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ApiResponseException {
