@@ -39,11 +39,12 @@ public class UPIFilterModule extends BaseFilterModule implements FilterModule {
     public void commonFilter(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ApiResponseException {
         try {
             System.out.println("HEY I'm A UPI authorization filter");
-            String upiId = PathParamExtractor.extractPathParams(path, "/(\\d+)/upi/\\S+.*", String.class);
+            String accNo = PathParamExtractor.extractPathParams(path, "/(\\d+)/upi/\\S+.*", String.class);
+            String upiId = PathParamExtractor.extractPathParams(path, "/\\d+/upi/(\\S+).*", String.class);
             Optional<Upi> upi = upiDao.findById(upiId);
             if (upi.isEmpty()) {
                 throw new ApiResponseException(HttpServletResponse.SC_NOT_FOUND, "UPI not found");
-            } else if (!upi.get().getAccNo().equals(PathParamExtractor.extractPathParams(path, "/(\\d+)/upi/\\S+.*", String.class))) {
+            } else if (!upi.get().getAccNo().equals(accNo)) {
                 throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
             }
             System.out.println("HEY I'm A UPI authorization filter:: success");
