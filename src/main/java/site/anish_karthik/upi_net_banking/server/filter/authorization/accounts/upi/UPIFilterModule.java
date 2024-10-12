@@ -22,7 +22,8 @@ public class UPIFilterModule extends BaseFilterModule implements FilterModule {
 
     public UPIFilterModule() {
         upiDao = new UpiDaoImpl();
-        registerCommonFilter("/\\d+/upi/\\S+.*", this::commonFilter);
+        registerMethodFilter("GET", "/\\d+/upi/\\S+", this::getFilter);
+        registerCommonFilter("/\\d+/upi/\\S+/\\S+", this::commonFilter);
         registerMethodFilter("POST", "/\\d+/upi/?", this::createUpiFilter);
     }
 
@@ -36,17 +37,35 @@ public class UPIFilterModule extends BaseFilterModule implements FilterModule {
         applyFilters(method, path, httpRequest, httpResponse);
     }
 
+    private void validateUpi(String accNo, String upiId) throws ApiResponseException {
+        Optional<Upi> upi = upiDao.findById(upiId);
+        if (upi.isEmpty()) {
+            throw new ApiResponseException(HttpServletResponse.SC_NOT_FOUND, "UPI not found");
+        } else if (!upi.get().getAccNo().equals(accNo)) {
+            throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+        }
+    }
+
     public void commonFilter(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ApiResponseException {
         try {
             System.out.println("HEY I'm A UPI authorization filter");
             String accNo = PathParamExtractor.extractPathParams(path, "/(\\d+)/upi/\\S+.*", String.class);
-            String upiId = PathParamExtractor.extractPathParams(path, "/\\d+/upi/(\\S+).*", String.class);
-            Optional<Upi> upi = upiDao.findById(upiId);
-            if (upi.isEmpty()) {
-                throw new ApiResponseException(HttpServletResponse.SC_NOT_FOUND, "UPI not found");
-            } else if (!upi.get().getAccNo().equals(accNo)) {
-                throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
-            }
+            String upiId = PathParamExtractor.extractPathParams(path, "/\\d+/upi/(\\S+)/\\S+", String.class);
+            validateUpi(accNo, upiId);
+            System.out.println("HEY I'm A UPI authorization filter:: success");
+        } catch (ApiResponseException ae) {
+            throw ae;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void getFilter(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ApiResponseException {
+        try {
+            System.out.println("HEY I'm A UPI authorization filter");
+            String accNo = PathParamExtractor.extractPathParams(path, "/(\\d+)/upi/\\S+.*", String.class);
+            String upiId = PathParamExtractor.extractPathParams(path, "/\\d+/upi/(\\S+)/?", String.class);
+            validateUpi(accNo, upiId);
             System.out.println("HEY I'm A UPI authorization filter:: success");
         } catch (ApiResponseException ae) {
             throw ae;
