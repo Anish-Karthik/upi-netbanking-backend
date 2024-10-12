@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.dto.CreateTransferDTO;
 import site.anish_karthik.upi_net_banking.server.dto.GetTransferDTO;
+import site.anish_karthik.upi_net_banking.server.dto.SessionUserDTO;
 import site.anish_karthik.upi_net_banking.server.model.BankTransfer;
 import site.anish_karthik.upi_net_banking.server.router.Router;
 import site.anish_karthik.upi_net_banking.server.service.TransferService;
@@ -35,6 +36,8 @@ public class TransferRouter {
         try {
             System.out.println("JO");
             CreateTransferDTO createTransferDTO = HttpRequestParser.parse(req, CreateTransferDTO.class);
+            SessionUserDTO sessionUserDTO = (SessionUserDTO) req.getAttribute("user");
+            createTransferDTO.getPayerTransaction().setUserId(sessionUserDTO.getId());
             GetTransferDTO res = transferService.handleTransfer(createTransferDTO);
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Transfer successful", res);
         } catch (IOException e) {

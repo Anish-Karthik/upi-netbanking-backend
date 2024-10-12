@@ -50,6 +50,8 @@ public class UpiBaseStrategy extends AccountBaseStrategy {
                 BankAccount bankAccount = upiService.getAccountDetails(transaction.getUpiId())
                         .orElseThrow(() -> new Exception("Account not found, Invalid UPI ID"));
                 transaction.setAccNo(bankAccount.getAccNo());
+                if (transaction.getUserId() == null || transaction.getUserId() == 0) transaction.setUserId(bankAccount.getUserId());
+                else if (!transaction.getUserId().equals(bankAccount.getUserId())) throw new Exception("User ID does not match with the account");
             }
         };
         invoker.addCommand(fetchBankAccountCommand);

@@ -10,25 +10,22 @@ import site.anish_karthik.upi_net_banking.server.model.Transaction;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetTransferDTO extends GetBaseTransferDTO {
-
-    private Transaction payerTransaction;
-    private Transaction payeeTransaction;
+public class GetTransferWithTransactionDTO extends GetBaseTransferDTO {
+    private Transaction transaction;
 
     public BankTransfer toBankTransfer() {
         return super.toBankTransfer();
     }
 
-    public static GetTransferDTO fromBankTransfer(BankTransfer transfer) {
+    public static GetTransferWithTransactionDTO fromBankTransfer(BankTransfer transfer) {
         GetBaseTransferDTO dto = GetBaseTransferDTO.fromBankTransfer(transfer);
-        GetTransferDTO transferDTO = fromBankTransfer(dto);
-        transferDTO.setPayerTransaction(Transaction.builder().transactionId(transfer.getPayerTransactionId()).build());
-        transferDTO.setPayeeTransaction(Transaction.builder().transactionId(transfer.getPayeeTransactionId()).build());
+        GetTransferWithTransactionDTO transferDTO = fromBankTransfer(dto);
+        transferDTO.setTransaction(Transaction.builder().transactionId(transfer.getPayerTransactionId()).build());
         return transferDTO;
     }
 
-    public static GetTransferDTO fromBankTransfer(GetBaseTransferDTO dto) {
-        GetTransferDTO transferDTO = new GetTransferDTO();
+    public static GetTransferWithTransactionDTO fromBankTransfer(GetBaseTransferDTO dto) {
+        GetTransferWithTransactionDTO transferDTO = new GetTransferWithTransactionDTO();
         transferDTO.setReferenceId(dto.getReferenceId());
         transferDTO.setPayerTransactionId(dto.getPayerTransactionId());
         transferDTO.setPayeeTransactionId(dto.getPayeeTransactionId());

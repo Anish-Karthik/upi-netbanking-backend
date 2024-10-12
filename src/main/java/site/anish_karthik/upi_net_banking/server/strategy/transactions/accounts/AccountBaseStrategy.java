@@ -32,6 +32,8 @@ public class AccountBaseStrategy extends TransactionStrategyImpl {
         GeneralCommand fetchBankAccountCommand = () -> {
             BankAccount bankAccount = bankAccountService.getBankAccountByAccNo(transaction.getAccNo());
             transaction.setAccNo(bankAccount.getAccNo());
+            if (transaction.getUserId() == null || transaction.getUserId() == 0) transaction.setUserId(bankAccount.getUserId());
+            else if (!transaction.getUserId().equals(bankAccount.getUserId())) throw new Exception("User ID does not match with the account");
         };
         return List.of(validatePermissionCommand, validateStatusCommand, fetchBankAccountCommand);
     }

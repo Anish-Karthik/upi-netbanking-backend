@@ -2,6 +2,7 @@ package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.TransactionDao;
 import site.anish_karthik.upi_net_banking.server.dao.TransferDao;
+import site.anish_karthik.upi_net_banking.server.dto.GetBaseTransferDTO;
 import site.anish_karthik.upi_net_banking.server.dto.GetTransferDTO;
 import site.anish_karthik.upi_net_banking.server.model.BankTransfer;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
@@ -20,10 +21,14 @@ public class TransferDaoImpl implements TransferDao {
     private final TransactionDao transactionDao;
     private final QueryBuilderUtil queryBuilderUtil = new QueryBuilderUtil();
 
-    public TransferDaoImpl() throws Exception {
+    public TransferDaoImpl() {
         // Initialize the connection (assuming a DataSource is available)
-        this.connection = DatabaseUtil.getConnection();
-        this.transactionDao = new TransactionDaoImpl(connection);
+        try {
+            this.connection = DatabaseUtil.getConnection();
+            this.transactionDao = new TransactionDaoImpl(connection);
+        } catch (Exception e) {
+            throw new RuntimeException("Error initializing TransferDaoImpl", e);
+        }
     }
     @Override
     public GetTransferDTO getDetailedTransfer(String referenceId) {
@@ -38,7 +43,7 @@ public class TransferDaoImpl implements TransferDao {
             throw new RuntimeException("Transaction not found");
         }
 
-        return GetTransferDTO.builder()
+        GetBaseTransferDTO transferDTO = GetBaseTransferDTO.builder()
                 .referenceId(transfer.get().getReferenceId())
                 .payerTransactionId(transfer.get().getPayerTransactionId())
                 .payeeTransactionId(transfer.get().getPayeeTransactionId())
@@ -48,10 +53,11 @@ public class TransferDaoImpl implements TransferDao {
                 .transferStatus(transfer.get().getTransferStatus())
                 .amount(payeeTransaction.get().getAmount())
                 .description(transfer.get().getDescription())
-                .payerTransaction(payerTransaction.get())
-                .payeeTransaction(payeeTransaction.get())
                 .build();
-
+        GetTransferDTO detailedTransferDTO = GetTransferDTO.fromBankTransfer(transferDTO);
+        detailedTransferDTO.setPayerTransaction(payerTransaction.get());
+        detailedTransferDTO.setPayeeTransaction(payeeTransaction.get());
+        return detailedTransferDTO;
     }
 
     @Override
