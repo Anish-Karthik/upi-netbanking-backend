@@ -82,11 +82,15 @@ public class UpiServiceImpl implements UpiService {
     }
 
     @Override
-    public Upi updateUpiPin(UpdateUpiPinDTO updateUpiPinDTO, String upiId) {
+    public void updateUpiPin(UpdateUpiPinDTO updateUpiPinDTO, String upiId) throws UpiException {
+        Upi existingUpi = upiDao.findById(upiId).orElseThrow(() -> new UpiException("UPI not found", HttpServletResponse.SC_NOT_FOUND));
+        if (!BCrypt.checkpw(updateUpiPinDTO.getOldPin().toString(), existingUpi.getUpiPinHashed())) {
+            throw new UpiException("Old UPI pin is incorrect", HttpServletResponse.SC_BAD_REQUEST);
+        }
         Upi upi = updateUpiPinDTO.toUpi();
         upi.setUpiPinHashed(BCrypt.hashpw(updateUpiPinDTO.getUpiPin().toString(), BCrypt.gensalt()));
         upi.setUpiId(upiId);
-        return upiDao.update(upi);
+        upiDao.update(upi);
     }
 
     @Override

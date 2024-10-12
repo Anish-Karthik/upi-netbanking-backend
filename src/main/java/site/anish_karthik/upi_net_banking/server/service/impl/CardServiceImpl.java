@@ -65,11 +65,15 @@ public  class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Card updateCardPin(UpdateCardPinDTO updateCardPinDTO, String cardNo) {
+    public void updateCardPin(UpdateCardPinDTO updateCardPinDTO, String cardNo) {
+        Card existingCard = cardDao.findById(cardNo).orElseThrow(() -> new RuntimeException("Card not found"));
+        if (!BCrypt.checkpw(updateCardPinDTO.getOldPin().toString(), existingCard.getAtmPinHashed())) {
+            throw new RuntimeException("Old pin is incorrect");
+        }
         Card card = updateCardPinDTO.toCard();
         card.setAtmPinHashed(BCrypt.hashpw(updateCardPinDTO.getAtmPin().toString(), BCrypt.gensalt()));
         card.setCardNo(cardNo);
-        return cardDao.update(card);
+        cardDao.update(card);
     }
 
     @Override

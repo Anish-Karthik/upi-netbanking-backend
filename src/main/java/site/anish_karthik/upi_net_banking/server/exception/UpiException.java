@@ -10,5 +10,4 @@ public class UpiException extends Exception {
         super(message);
         this.statusCode = statusCode;
     }
-
 }

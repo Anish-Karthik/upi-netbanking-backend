@@ -12,7 +12,7 @@ public interface UpiService extends PaymentMethodService {
     List<GetUpiDTO> getUpiByAccNo(String accNo) throws Exception;
     GetUpiDTO getUpiById(String upiId) throws Exception;
     Upi updateUpiStatus(UpdateUpiDTOStatus updateUpiDTO, String upiId) throws Exception;
-    Upi updateUpiPin(UpdateUpiPinDTO updateUpiPinDTO, String upiId) throws Exception;
+    void updateUpiPin(UpdateUpiPinDTO updateUpiPinDTO, String upiId) throws Exception;
 //    Upi deactivate(String upiId, String accNo) throws Exception;
     Upi changeDefaultUpi(UpdateUpiDTODefault updateUpiDTODefault, String upiId, String acc) throws Exception;
 }
