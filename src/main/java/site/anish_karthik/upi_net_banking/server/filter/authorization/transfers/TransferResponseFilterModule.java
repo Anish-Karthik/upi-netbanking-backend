@@ -24,7 +24,7 @@ public class TransferResponseFilterModule extends BaseFilterModule implements Fi
     @Override
     public void handle(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ApiResponseException {
         System.out.println("************HEHEHEHEH*********");
-        path = httpRequest.getPathInfo();
+        path = httpRequest.getPathInfo() == null ? "/" : httpRequest.getPathInfo();
         String method = httpRequest.getMethod();
         user = (SessionUserDTO) httpRequest.getAttribute("user");
         System.out.println("user: " + user +", path: " + path + ", method: " + method);

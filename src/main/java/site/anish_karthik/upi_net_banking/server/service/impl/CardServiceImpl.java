@@ -77,9 +77,14 @@ public  class CardServiceImpl implements CardService {
     }
 
     @Override
+    public void blockCard(String cardNo) throws Exception {
+        Card card = Card.builder().cardNo(cardNo).status(CardStatus.BLOCKED).build();
+        cardDao.update(card);
+    }
+
+    @Override
     public Card deactivate(String cardNo, String accNo) throws Exception {
-        Card card = cardDao.findById(cardNo).orElseThrow(() -> new Exception("Card not found"));
-        card.setStatus(CardStatus.CLOSED);
+        Card card = Card.builder().cardNo(cardNo).status(CardStatus.CLOSED).build();
         return cardDao.update(card);
     }
 

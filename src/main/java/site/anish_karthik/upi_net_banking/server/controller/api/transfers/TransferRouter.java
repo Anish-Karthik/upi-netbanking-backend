@@ -27,8 +27,8 @@ public class TransferRouter {
     }
 
     public void register(Router router) {
-        router.post("/", this::makeTransfer);
-        router.get("/", this::getTransfers);
+        router.post("/?", this::makeTransfer);
+        router.get("/?", this::getTransfers);
         router.get("/:refId", this::getTransfer);
     }
 

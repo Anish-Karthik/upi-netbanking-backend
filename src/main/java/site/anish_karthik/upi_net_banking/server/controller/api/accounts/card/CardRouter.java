@@ -39,6 +39,8 @@ public class CardRouter {
         router.post("/\\d+/card", this::createCard);
         router.put("/\\d+/card/\\d+/pin", this::updateCardPin);
         router.put("/\\d+/card/\\d+", this::updateCard);
+        router.put("/\\d+/card/\\d+/status", this::updateCardStatus);
+        router.put("/\\d+/card/\\d+/block", this::blockCard);
         router.delete("/\\d+/card/\\d+", this::deactivateCard);
     }
 
@@ -101,6 +103,27 @@ public class CardRouter {
             String cardId = PathParamExtractor.extractPathParams(req.getPathInfo(), "/\\d+/card/(\\d+)", String.class);
             var res = cardService.deactivate(cardId, accNo);
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card deactivated", res);
+        } catch (Exception e) {
+            handleException(req, resp, e);
+        }
+    }
+
+    private void updateCardStatus(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            UpdateCardDTOStatus updateCardDTOStatus = HttpRequestParser.parse(req, UpdateCardDTOStatus.class);
+            String cardNo = PathParamExtractor.extractPathParams(req.getPathInfo(), "/\\d+/card/(\\d+)/status", String.class);
+            var res = UpdateCardDTOStatus.fromCard(cardService.updateCard(UpdateCardDTO.fromCard(updateCardDTOStatus.toCard()), cardNo));
+            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card status updated", res);
+        } catch (Exception e) {
+            handleException(req, resp, e);
+        }
+    }
+
+    private void blockCard(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            String cardNo = PathParamExtractor.extractPathParams(req.getPathInfo(), "/\\d+/card/(\\d+)/block", String.class);
+            cardService.blockCard(cardNo);
+            ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Card blocked", "Blocked");
         } catch (Exception e) {
             handleException(req, resp, e);
         }

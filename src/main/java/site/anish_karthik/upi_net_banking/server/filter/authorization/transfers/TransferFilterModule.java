@@ -25,10 +25,11 @@ public class TransferFilterModule extends BaseFilterModule implements FilterModu
     @Override
     public void handle(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         System.out.println("HEY I'm A transfers authorization filter::2");
-        path = httpRequest.getPathInfo();
+        path = httpRequest.getPathInfo() == null ? "/" : httpRequest.getPathInfo();
         String method = httpRequest.getMethod();
         user = (SessionUserDTO) httpRequest.getAttribute("user");
 
+        System.out.println("user: " + user + ", path: " + path + ", method: " + method);
         applyFilters(method, path, httpRequest, httpResponse);
     }
 
