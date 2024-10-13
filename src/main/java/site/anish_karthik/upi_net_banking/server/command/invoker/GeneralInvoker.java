@@ -14,7 +14,6 @@ public class GeneralInvoker implements Invoker<GeneralCommand> {
 
     @Override
     public void addCommand(GeneralCommand command) {
-
         this.commands.add(command);
     }
 

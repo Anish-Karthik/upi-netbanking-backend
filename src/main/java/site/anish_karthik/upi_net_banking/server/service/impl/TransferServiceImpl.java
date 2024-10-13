@@ -175,6 +175,7 @@ public class TransferServiceImpl implements TransferService {
         invoker.addCommand(() -> {
             transfer.setTransferStatus(TransferStatus.SUCCESS);
             transfer.setEndedAt(Timestamp.from(java.time.Instant.now()));
+            transferDao.update(transfer);
         });
 
         try {
@@ -188,6 +189,7 @@ public class TransferServiceImpl implements TransferService {
         invoker.addCommand(() -> {
             transfer.setTransferStatus(TransferStatus.FAILURE);
             transfer.setEndedAt(Timestamp.from(java.time.Instant.now()));
+            transferDao.update(transfer);
         });
 
         try {

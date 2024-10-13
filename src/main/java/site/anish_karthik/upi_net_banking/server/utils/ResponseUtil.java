@@ -2,9 +2,6 @@ package site.anish_karthik.upi_net_banking.server.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -17,7 +14,7 @@ public class ResponseUtil {
         sendResponse(request, response, apiResponse);
     }
 
-    public static void sendResponse(HttpServletRequest request, HttpServletResponse response, ApiResponse apiResponse) throws IOException {
+    public static void sendResponse(HttpServletRequest request, HttpServletResponse response, ApiResponse<Object> apiResponse) throws IOException {
         String acceptHeader = request.getHeader("Accept");
 
         if (acceptHeader == null || acceptHeader.contains("text/html")) {

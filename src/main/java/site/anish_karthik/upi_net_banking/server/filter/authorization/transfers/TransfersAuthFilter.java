@@ -30,7 +30,6 @@ public class TransfersAuthFilter implements Filter {
 
             chain.doFilter(request, responseWrapper);
 
-
             new TransferResponseFilterModule().handle(httpRequest, responseWrapper);
         } catch (ApiResponseException ae) {
             System.out.println("Error: " + ae.getApiResponse());

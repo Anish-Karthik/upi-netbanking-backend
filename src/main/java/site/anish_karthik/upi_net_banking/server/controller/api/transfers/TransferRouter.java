@@ -34,11 +34,11 @@ public class TransferRouter {
 
     private void makeTransfer(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            System.out.println("JO");
             CreateTransferDTO createTransferDTO = HttpRequestParser.parse(req, CreateTransferDTO.class);
             SessionUserDTO sessionUserDTO = (SessionUserDTO) req.getAttribute("user");
             createTransferDTO.getPayerTransaction().setUserId(sessionUserDTO.getId());
             GetTransferDTO res = transferService.handleTransfer(createTransferDTO);
+            System.out.println("res: " + res);
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Transfer successful", res);
         } catch (IOException e) {
             handleException(req, resp, e);
