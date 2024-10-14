@@ -13,4 +13,5 @@ public interface BankAccountDao extends GenericDao<BankAccount, String> {
     Optional<GetBankAccountDTO> findByIdWithBank(String accNo);
     Optional<BankAccount> findByTransactionId(Long transactionId);
     void updateAccountBalance(String accNo, BigDecimal amount) throws Exception;
+
 }

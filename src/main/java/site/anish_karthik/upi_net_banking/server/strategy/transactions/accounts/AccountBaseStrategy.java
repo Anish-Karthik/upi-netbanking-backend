@@ -10,6 +10,7 @@ import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.strategy.transactions.TransactionStrategyImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AccountBaseStrategy extends TransactionStrategyImpl {
@@ -35,6 +36,10 @@ public class AccountBaseStrategy extends TransactionStrategyImpl {
             if (transaction.getUserId() == null || transaction.getUserId() == 0) transaction.setUserId(bankAccount.getUserId());
             else if (!transaction.getUserId().equals(bankAccount.getUserId())) throw new Exception("User ID does not match with the account");
         };
-        return List.of(validatePermissionCommand, validateStatusCommand, fetchBankAccountCommand);
+        List<GeneralCommand> commands = new ArrayList<>(List.of(validatePermissionCommand, validateStatusCommand, fetchBankAccountCommand));
+        if (transaction.getPaymentMethod() == Transaction.PaymentMethod.ACCOUNT) {
+            commands.add(() -> getBankAccountService().verifyPin(transaction.getAccNo(), transaction.getPin()));
+        }
+        return commands;
     }
 }

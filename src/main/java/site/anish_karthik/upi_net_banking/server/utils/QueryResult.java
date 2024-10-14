@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class QueryResult {
-    private String query;
+    private final String query;
     private List<Object> parameters;
     public static String toSnakeCase(String camelCase) {
         String regex = "([a-z])([A-Z]+)";
@@ -17,5 +17,4 @@ public class QueryResult {
         this.query = query;
         this.parameters = parameters;
     }
-
 }

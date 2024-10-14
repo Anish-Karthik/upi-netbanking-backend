@@ -2,12 +2,16 @@ package site.anish_karthik.upi_net_banking.server.service.impl;
 
 
 import site.anish_karthik.upi_net_banking.server.dao.BankAccountDao;
+import site.anish_karthik.upi_net_banking.server.dao.UserDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.BankAccountDaoImpl;
+import site.anish_karthik.upi_net_banking.server.dao.impl.UserDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dto.GetBankAccountDTO;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
+import site.anish_karthik.upi_net_banking.server.model.User;
 import site.anish_karthik.upi_net_banking.server.model.enums.AccountStatus;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
+import site.anish_karthik.upi_net_banking.server.service.AuthService;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.PaymentMethodService;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
@@ -19,6 +23,7 @@ import java.util.List;
 public class BankAccountServiceImpl implements BankAccountService {
 
     private final BankAccountDao bankAccountDao = new BankAccountDaoImpl(DatabaseUtil.getConnection());
+    private final UserDao userDao = new UserDaoImpl();
     private final List<PaymentMethodService> paymentMethodServices;
 
     public BankAccountServiceImpl() throws SQLException, ClassNotFoundException {
@@ -32,7 +37,7 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public BankAccount getBankAccountByAccNo(String accNo) {
-        return bankAccountDao.findById(accNo).orElse(null);
+        return bankAccountDao.findById(accNo).orElseThrow();
     }
 
     @Override
@@ -123,6 +128,15 @@ public class BankAccountServiceImpl implements BankAccountService {
         BankAccount account = bankAccountDao.findByTransactionId(transaction.getTransactionId()).orElseThrow(() -> new Exception("Account not found"));
         account.setBalance(account.getBalance().subtract(transaction.getAmount()));
         bankAccountDao.update(account);
+    }
+
+    @Override
+    public void verifyPin(String accNo, String pin) throws Exception {
+        User user = userDao.findByAccNo(accNo).orElseThrow(() -> new Exception("User not found"));
+        System.out.println("Verifying PIN for account: " + accNo +"\n\n"+pin+user);
+        if (!AuthService.verifyPassword(user, pin)) {
+            throw new Exception("Invalid PIN");
+        }
     }
 
 }

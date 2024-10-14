@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.dto.CreateTransferDTO;
 import site.anish_karthik.upi_net_banking.server.dto.GetTransferDTO;
 import site.anish_karthik.upi_net_banking.server.dto.SessionUserDTO;
-import site.anish_karthik.upi_net_banking.server.model.BankTransfer;
 import site.anish_karthik.upi_net_banking.server.router.Router;
 import site.anish_karthik.upi_net_banking.server.service.TransferService;
 import site.anish_karthik.upi_net_banking.server.service.impl.TransferServiceImpl;

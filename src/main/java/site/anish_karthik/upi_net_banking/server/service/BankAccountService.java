@@ -20,4 +20,5 @@ public interface BankAccountService {
     void rollbackAccountBalanceUpdate(Transaction transaction) throws Exception;
     void deposit(Transaction transaction) throws Exception;
     void withdraw(Transaction transaction) throws Exception;
+    void verifyPin(String accNo, String pin) throws Exception;
 }

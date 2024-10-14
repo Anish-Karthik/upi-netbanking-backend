@@ -9,6 +9,7 @@ import site.anish_karthik.upi_net_banking.server.dao.impl.TransactionDaoImpl;
 import site.anish_karthik.upi_net_banking.server.factories.method.TransactionFactory;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory;
+import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.TransactionService;
 import site.anish_karthik.upi_net_banking.server.strategy.transactions.TransactionStrategy;
@@ -69,7 +70,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction handleTransaction(Transaction transaction, TransactionCategory category) throws Exception {
+    public Transaction handleTransaction(Transaction transaction, TransactionCategory category, String pin) throws Exception {
         TransactionStrategy transactionStrategy = transactionFactory.getStrategy(transaction.getPaymentMethod(), transaction.getTransactionType(),category);
         transaction = transactionStrategy.execute(transaction, this::makeTransaction);
         return transaction;

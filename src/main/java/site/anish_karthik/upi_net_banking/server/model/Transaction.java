@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import site.anish_karthik.upi_net_banking.server.annotation.IgnoreField;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionStatus;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 
@@ -26,6 +27,9 @@ public class Transaction {
     private Timestamp startedAt;
     private Timestamp endedAt;
     private String referenceId;
+
+    @IgnoreField
+    private String pin;
 
     public enum PaymentMethod {
         CARD, UPI, ACCOUNT

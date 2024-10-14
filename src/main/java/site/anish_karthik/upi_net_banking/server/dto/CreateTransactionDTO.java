@@ -22,6 +22,7 @@ public class CreateTransactionDTO {
     private TransactionType transactionType;
     private String byCardNo;
     private String upiId;
+    private String pin;
     private Transaction.PaymentMethod paymentMethod;
 
     public Transaction toTransaction() {
@@ -32,6 +33,7 @@ public class CreateTransactionDTO {
                 .transactionType(transactionType)
                 .byCardNo(byCardNo)
                 .upiId(upiId)
+                .pin(pin)
                 .startedAt(new Timestamp(System.currentTimeMillis()))
                 .transactionStatus(TransactionStatus.PROCESSING)
                 .build();
@@ -45,6 +47,7 @@ public class CreateTransactionDTO {
                 .transactionType(transaction.getTransactionType())
                 .byCardNo(transaction.getByCardNo())
                 .upiId(transaction.getUpiId())
+                .pin(transaction.getPin())
                 .paymentMethod(transaction.getPaymentMethod())
                 .build();
     }

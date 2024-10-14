@@ -1,8 +1,8 @@
 package site.anish_karthik.upi_net_banking.server.service;
 
+import org.mindrot.jbcrypt.BCrypt;
 import site.anish_karthik.upi_net_banking.server.dao.UserDao;
 import site.anish_karthik.upi_net_banking.server.model.User;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Optional;
 
@@ -13,7 +13,6 @@ public class AuthService {
     public AuthService(UserDao userDao) {
         this.userDao = userDao;
     }
-
     public Optional<User> registerUser(User user) {
         // Check if the user already exists
         if (userDao.findByEmail(user.getEmail()).isPresent()) {
@@ -42,5 +41,9 @@ public class AuthService {
         }
 
         return userOpt;  // Return the authenticated user
+    }
+
+    public static boolean verifyPassword(User user, String password) {
+        return BCrypt.checkpw(password, user.getPassword());
     }
 }

@@ -56,7 +56,8 @@ public class TransactionRouter {
     public void processTransaction(HttpServletRequest req, HttpServletResponse resp) {
         try {
             CreateTransactionDTO transactionDTO = HttpRequestParser.parse(req, CreateTransactionDTO.class);
-            Transaction transaction = transactionService.handleTransaction(transactionDTO.toTransaction(), TransactionCategory.SOLO);
+
+            Transaction transaction = transactionService.handleTransaction(transactionDTO.toTransaction(), TransactionCategory.SOLO, transactionDTO.getPin());
             ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Transaction Success", transaction);
         } catch (Exception e) {
             handleException(req, resp, e);

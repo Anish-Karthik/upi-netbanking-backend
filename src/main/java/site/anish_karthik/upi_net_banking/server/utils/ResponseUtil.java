@@ -32,10 +32,11 @@ public class ResponseUtil {
     }
 
     public static ApiResponse<Object> prepareResponse(int statusCode, String message, Object data) {
+        Object filteredData = FieldFilterUtil.filterIgnoredFields(data);
         return ApiResponse.builder()
                 .status(statusCode)
                 .message(message)
-                .data(data)
+                .data(filteredData)
                 .build();
     }
 }

@@ -13,7 +13,7 @@ public interface TransactionService {
 
     Transaction executeTransaction(Transaction transaction, TransferInvoker invoker);
 
-    Transaction handleTransaction(Transaction transaction, TransactionCategory category) throws Exception;
+    Transaction handleTransaction(Transaction transaction, TransactionCategory category, String pin) throws Exception;
     void deleteTransaction(Long transactionId) throws Exception;
     void updateTransaction(Transaction transaction) throws Exception;
     Transaction getTransactionById(Long transactionId) throws Exception;

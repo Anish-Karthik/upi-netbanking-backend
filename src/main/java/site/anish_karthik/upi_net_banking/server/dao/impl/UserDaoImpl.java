@@ -99,6 +99,12 @@ public class UserDaoImpl implements UserDao {
         return getUser(phone, sql);
     }
 
+    @Override
+    public Optional<User> findByAccNo(String accNo) {
+        String sql = "SELECT u.* FROM user u JOIN bank_account ba ON u.id = ba.user_id WHERE ba.acc_no = ?";
+        return getUser(accNo, sql);
+    }
+
     private <T> Optional<User> getUser(T arg, String sql) {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             if (arg instanceof String) {
