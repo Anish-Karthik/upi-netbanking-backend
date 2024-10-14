@@ -15,4 +15,5 @@ public interface CardService extends PaymentMethodService {
     Card updateCard(UpdateCardDTO updateCardDTO, String cardNo) throws Exception;
     void updateCardPin(UpdateCardPinDTO updateCardPinDTO, String cardNo) throws Exception;
     void blockCard(String cardNo) throws Exception;
+    void verifyPin(String cardNo, String pin) throws Exception;
 }

@@ -33,11 +33,7 @@ public class TransactionStrategyImpl implements TransactionStrategy {
         for (GeneralCommand command : commands) {
             invoker.addCommand(command);
         }
-        try {
-            invoker.executeInParallel();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        invoker.executeInParallel();
         return transaction;
     }
 

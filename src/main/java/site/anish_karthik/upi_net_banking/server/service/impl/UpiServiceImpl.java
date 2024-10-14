@@ -191,6 +191,15 @@ public class UpiServiceImpl implements UpiService {
         return upi;
     }
 
+    @Override
+    public void verifyPin(String upiId, String pin) throws Exception {
+        System.out.println("Verifying UPI pin");
+        Upi upi = upiDao.findById(upiId).orElseThrow(() -> new Exception("UPI not found"));
+        if (pin == null || !BCrypt.checkpw(pin, upi.getUpiPinHashed())) {
+            throw new Exception("Invalid UPI pin");
+        }
+    }
+
     private Boolean determineIsDefault(List<Upi> existingUpisForGivenAccNo) {
         return existingUpisForGivenAccNo.stream()
                 .noneMatch(upi -> (upi.getStatus() == UpiStatus.ACTIVE || upi.getIsDefault()));

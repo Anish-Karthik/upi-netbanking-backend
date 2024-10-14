@@ -2,7 +2,6 @@
 package site.anish_karthik.upi_net_banking.server.service;
 
 import site.anish_karthik.upi_net_banking.server.dto.*;
-import site.anish_karthik.upi_net_banking.server.model.Card;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
 
 import java.util.List;
@@ -15,5 +14,6 @@ public interface UpiService extends PaymentMethodService {
     void updateUpiPin(UpdateUpiPinDTO updateUpiPinDTO, String upiId) throws Exception;
 //    Upi deactivate(String upiId, String accNo) throws Exception;
     Upi changeDefaultUpi(UpdateUpiDTODefault updateUpiDTODefault, String upiId, String acc) throws Exception;
+    void verifyPin(String upiId, String pin) throws Exception;
 }
 

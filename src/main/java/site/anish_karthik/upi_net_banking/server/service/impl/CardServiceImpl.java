@@ -83,6 +83,14 @@ public  class CardServiceImpl implements CardService {
     }
 
     @Override
+    public void verifyPin(String cardNo, String pin) throws Exception {
+        Card card = cardDao.findById(cardNo).orElseThrow(() -> new Exception("Card not found"));
+        if (pin == null || !BCrypt.checkpw(pin, card.getAtmPinHashed())) {
+            throw new Exception("Invalid pin");
+        }
+    }
+
+    @Override
     public Card deactivate(String cardNo, String accNo) throws Exception {
         Card card = Card.builder().cardNo(cardNo).status(CardStatus.CLOSED).build();
         return cardDao.update(card);

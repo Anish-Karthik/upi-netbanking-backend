@@ -22,11 +22,11 @@ public class AccountBaseStrategy extends TransactionStrategyImpl {
     @Override
     public Transaction prepareTransaction(Transaction transaction) throws Exception {
         Permission permission = getPermission(transaction, super.getTransactionCategory());
-        transaction = super.executePrepareTransaction(transaction, getGeneralInvoker(transaction, permission));
+        transaction = super.executePrepareTransaction(transaction, getGeneralCommands(transaction, permission));
         return transaction;
     }
 
-    private List<GeneralCommand> getGeneralInvoker(Transaction transaction, Permission permission) {
+    private List<GeneralCommand> getGeneralCommands(Transaction transaction, Permission permission) {
         var bankAccountService =  super.getBankAccountService();
         GeneralCommand validatePermissionCommand = new AccountPermissionCommand(transaction.getAccNo(), permission);
         GeneralCommand validateStatusCommand = new AccountValidateStatusCommand(transaction.getAccNo(), bankAccountService);
