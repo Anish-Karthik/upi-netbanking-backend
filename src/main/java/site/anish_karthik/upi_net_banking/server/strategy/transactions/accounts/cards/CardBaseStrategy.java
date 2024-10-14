@@ -3,8 +3,6 @@ package site.anish_karthik.upi_net_banking.server.strategy.transactions.accounts
 import site.anish_karthik.upi_net_banking.server.command.GeneralCommand;
 import site.anish_karthik.upi_net_banking.server.command.impl.validation.permission.CardPermissionCommand;
 import site.anish_karthik.upi_net_banking.server.command.impl.validation.status.CardValidateStatusCommand;
-import site.anish_karthik.upi_net_banking.server.command.invoker.GeneralInvoker;
-import site.anish_karthik.upi_net_banking.server.factories.method.PermissionFactory;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Permission;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
@@ -12,6 +10,7 @@ import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.CardService;
 import site.anish_karthik.upi_net_banking.server.service.impl.CardServiceImpl;
+import site.anish_karthik.upi_net_banking.server.strategy.pin.PinRequirementContext;
 import site.anish_karthik.upi_net_banking.server.strategy.transactions.accounts.AccountBaseStrategy;
 
 import java.util.List;
@@ -36,7 +35,11 @@ public class CardBaseStrategy extends AccountBaseStrategy {
 
     private List<GeneralCommand> getGeneralCommands(Transaction transaction, Permission permission) {
 
-        GeneralCommand verifyPinCommand = () -> cardService.verifyPin(transaction.getByCardNo(), transaction.getPin());
+        GeneralCommand verifyPinCommand = () -> {
+            if (new PinRequirementContext().isPinNotRequired(transaction, TransactionCategory.TRANSFER)) {
+                cardService.verifyPin(transaction.getByCardNo(), transaction.getPin());
+            }
+        };
         GeneralCommand validatePermissionCommand = new CardPermissionCommand(transaction.getByCardNo(), permission);
         GeneralCommand validateStatusCommand = new CardValidateStatusCommand(transaction.getByCardNo(), cardService);
         GeneralCommand fetchBankAccountCommand = () -> {

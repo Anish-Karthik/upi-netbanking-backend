@@ -8,6 +8,8 @@ import site.anish_karthik.upi_net_banking.server.model.Permission;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
+import site.anish_karthik.upi_net_banking.server.strategy.pin.PinRequirementContext;
+import site.anish_karthik.upi_net_banking.server.strategy.pin.PinRequirementStrategy;
 import site.anish_karthik.upi_net_banking.server.strategy.transactions.TransactionStrategyImpl;
 
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class AccountBaseStrategy extends TransactionStrategyImpl {
 
     private List<GeneralCommand> getGeneralCommands(Transaction transaction, Permission permission) {
         var bankAccountService =  super.getBankAccountService();
+        GeneralCommand verifyPinCommand = getVerifyPinCommand(transaction, bankAccountService);
         GeneralCommand validatePermissionCommand = new AccountPermissionCommand(transaction.getAccNo(), permission);
         GeneralCommand validateStatusCommand = new AccountValidateStatusCommand(transaction.getAccNo(), bankAccountService);
         GeneralCommand fetchBankAccountCommand = () -> {
@@ -36,10 +39,16 @@ public class AccountBaseStrategy extends TransactionStrategyImpl {
             if (transaction.getUserId() == null || transaction.getUserId() == 0) transaction.setUserId(bankAccount.getUserId());
             else if (!transaction.getUserId().equals(bankAccount.getUserId())) throw new Exception("User ID does not match with the account");
         };
-        List<GeneralCommand> commands = new ArrayList<>(List.of(validatePermissionCommand, validateStatusCommand, fetchBankAccountCommand));
-        if (transaction.getPaymentMethod() == Transaction.PaymentMethod.ACCOUNT) {
-            commands.add(() -> getBankAccountService().verifyPin(transaction.getAccNo(), transaction.getPin()));
-        }
-        return commands;
+
+        return new ArrayList<>(List.of(verifyPinCommand, validatePermissionCommand, validateStatusCommand, fetchBankAccountCommand));
+    }
+
+    private static GeneralCommand getVerifyPinCommand(Transaction transaction, BankAccountService bankAccountService) {
+        PinRequirementStrategy accountPinRequirementStrategy = (transaction1, _) -> transaction1.getPaymentMethod() == Transaction.PaymentMethod.ACCOUNT;
+        return () -> {
+            if (new PinRequirementContext(accountPinRequirementStrategy).isPinNotRequired(transaction, TransactionCategory.TRANSFER)) {
+                bankAccountService.verifyPin(transaction.getAccNo(), transaction.getPin());
+            }
+        };
     }
 }
