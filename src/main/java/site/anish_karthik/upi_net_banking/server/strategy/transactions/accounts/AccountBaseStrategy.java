@@ -7,6 +7,7 @@ import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Permission;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory;
+import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.strategy.transactions.TransactionStrategyImpl;
 
@@ -28,6 +29,12 @@ public class AccountBaseStrategy extends TransactionStrategyImpl {
 
     private List<GeneralCommand> getGeneralCommands(Transaction transaction, Permission permission) {
         var bankAccountService =  super.getBankAccountService();
+        GeneralCommand verifyPinCommand = () -> {
+            if (transaction.getPaymentMethod() != Transaction.PaymentMethod.ACCOUNT
+                    || (getTransactionCategory() == TransactionCategory.TRANSFER &&
+                    transaction.getTransactionType() == TransactionType.DEPOSIT)) return;
+            bankAccountService.verifyPin(transaction.getAccNo(), transaction.getPin());
+        };
         GeneralCommand validatePermissionCommand = new AccountPermissionCommand(transaction.getAccNo(), permission);
         GeneralCommand validateStatusCommand = new AccountValidateStatusCommand(transaction.getAccNo(), bankAccountService);
         GeneralCommand fetchBankAccountCommand = () -> {
@@ -36,10 +43,6 @@ public class AccountBaseStrategy extends TransactionStrategyImpl {
             if (transaction.getUserId() == null || transaction.getUserId() == 0) transaction.setUserId(bankAccount.getUserId());
             else if (!transaction.getUserId().equals(bankAccount.getUserId())) throw new Exception("User ID does not match with the account");
         };
-        List<GeneralCommand> commands = new ArrayList<>(List.of(validatePermissionCommand, validateStatusCommand, fetchBankAccountCommand));
-        if (transaction.getPaymentMethod() == Transaction.PaymentMethod.ACCOUNT) {
-            commands.add(() -> getBankAccountService().verifyPin(transaction.getAccNo(), transaction.getPin()));
-        }
-        return commands;
+        return List.of(verifyPinCommand, validatePermissionCommand, validateStatusCommand, fetchBankAccountCommand);
     }
 }

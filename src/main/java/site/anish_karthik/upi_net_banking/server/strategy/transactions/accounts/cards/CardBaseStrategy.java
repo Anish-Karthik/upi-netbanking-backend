@@ -9,6 +9,7 @@ import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Permission;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory;
+import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.CardService;
 import site.anish_karthik.upi_net_banking.server.service.impl.CardServiceImpl;
@@ -36,7 +37,11 @@ public class CardBaseStrategy extends AccountBaseStrategy {
 
     private List<GeneralCommand> getGeneralCommands(Transaction transaction, Permission permission) {
 
-        GeneralCommand verifyPinCommand = () -> cardService.verifyPin(transaction.getByCardNo(), transaction.getPin());
+        GeneralCommand verifyPinCommand = () -> {
+            if (getTransactionCategory() == TransactionCategory.TRANSFER &&
+                    transaction.getTransactionType() == TransactionType.DEPOSIT) return;
+            cardService.verifyPin(transaction.getByCardNo(), transaction.getPin());
+        };
         GeneralCommand validatePermissionCommand = new CardPermissionCommand(transaction.getByCardNo(), permission);
         GeneralCommand validateStatusCommand = new CardValidateStatusCommand(transaction.getByCardNo(), cardService);
         GeneralCommand fetchBankAccountCommand = () -> {
