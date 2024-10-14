@@ -16,6 +16,7 @@ public class PermissionFactory {
     static {
         initializeSoloPermissions();
         initializeTransferPermissions();
+        initializePaymentMethodPermissions();
     }
 
     private static void initializeSoloPermissions() {
