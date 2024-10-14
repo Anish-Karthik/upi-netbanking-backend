@@ -4,11 +4,11 @@ import org.mindrot.jbcrypt.BCrypt;
 import site.anish_karthik.upi_net_banking.server.dao.CardDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.CardDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dto.*;
-import site.anish_karthik.upi_net_banking.server.model.BankAccount;
-import site.anish_karthik.upi_net_banking.server.model.Card;
-import site.anish_karthik.upi_net_banking.server.model.PaymentMethod;
+import site.anish_karthik.upi_net_banking.server.factories.method.PermissionFactory;
+import site.anish_karthik.upi_net_banking.server.model.*;
 import site.anish_karthik.upi_net_banking.server.model.enums.CardStatus;
 import site.anish_karthik.upi_net_banking.server.service.CardService;
+import site.anish_karthik.upi_net_banking.server.service.PermissionService;
 import site.anish_karthik.upi_net_banking.server.utils.CardUtil;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 
@@ -18,9 +18,11 @@ import java.util.Optional;
 
 public  class CardServiceImpl implements CardService {
     private final CardDao cardDao;
+    private final PermissionService permissionService;
 
     public CardServiceImpl() throws Exception {
         this.cardDao = new CardDaoImpl(DatabaseUtil.getConnection());
+        this.permissionService = new PermissionServiceImpl();
     }
     @Override
     public Card createCard(CreateCardDTO createCardDTO) {
@@ -36,7 +38,11 @@ public  class CardServiceImpl implements CardService {
                 .validFrom(new Date(System.currentTimeMillis()))
                 .userId(createCardDTO.getUserId())
                 .build();
-        return cardDao.save(card);
+
+        card = cardDao.save(card);
+        Permission permission = PermissionFactory.setPermissionObject(Transaction.PaymentMethod.CARD, card.getCardNo());
+        permissionService.savePermission(permission);
+        return card;
     }
 
     @Override

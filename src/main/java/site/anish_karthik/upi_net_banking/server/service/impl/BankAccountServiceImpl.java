@@ -1,12 +1,13 @@
 package site.anish_karthik.upi_net_banking.server.service.impl;
 
-
 import site.anish_karthik.upi_net_banking.server.dao.BankAccountDao;
 import site.anish_karthik.upi_net_banking.server.dao.UserDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.BankAccountDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dao.impl.UserDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dto.GetBankAccountDTO;
+import site.anish_karthik.upi_net_banking.server.factories.method.PermissionFactory;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
+import site.anish_karthik.upi_net_banking.server.model.Permission;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.User;
 import site.anish_karthik.upi_net_banking.server.model.enums.AccountStatus;
@@ -14,6 +15,7 @@ import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 import site.anish_karthik.upi_net_banking.server.service.AuthService;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.PaymentMethodService;
+import site.anish_karthik.upi_net_banking.server.service.PermissionService;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 
 import java.math.BigDecimal;
@@ -25,6 +27,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     private final BankAccountDao bankAccountDao = new BankAccountDaoImpl(DatabaseUtil.getConnection());
     private final UserDao userDao = new UserDaoImpl();
     private final List<PaymentMethodService> paymentMethodServices;
+    private final PermissionService permissionService = new PermissionServiceImpl();
 
     public BankAccountServiceImpl() throws SQLException, ClassNotFoundException {
         try {
@@ -57,7 +60,10 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public BankAccount addBankAccount(BankAccount account) {
-        return bankAccountDao.save(account);
+        BankAccount acc =  bankAccountDao.save(account);
+        Permission permission = PermissionFactory.setPermissionObject(Transaction.PaymentMethod.ACCOUNT, acc.getAccNo());
+        permissionService.savePermission(permission);
+        return acc;
     }
 
     @Override

@@ -1,4 +1,3 @@
-// UpiCardServiceImpl.java
 package site.anish_karthik.upi_net_banking.server.service.impl;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,13 +8,12 @@ import site.anish_karthik.upi_net_banking.server.dao.impl.BankAccountDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dao.impl.UserDaoImpl;
 import site.anish_karthik.upi_net_banking.server.dto.*;
 import site.anish_karthik.upi_net_banking.server.exception.UpiException;
-import site.anish_karthik.upi_net_banking.server.model.BankAccount;
-import site.anish_karthik.upi_net_banking.server.model.PaymentMethod;
-import site.anish_karthik.upi_net_banking.server.model.Upi;
-import site.anish_karthik.upi_net_banking.server.model.User;
+import site.anish_karthik.upi_net_banking.server.factories.method.PermissionFactory;
+import site.anish_karthik.upi_net_banking.server.model.*;
 import site.anish_karthik.upi_net_banking.server.model.enums.UpiStatus;
 import site.anish_karthik.upi_net_banking.server.dao.UpiDao;
 import site.anish_karthik.upi_net_banking.server.dao.impl.UpiDaoImpl;
+import site.anish_karthik.upi_net_banking.server.service.PermissionService;
 import site.anish_karthik.upi_net_banking.server.service.UpiService;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.UpiUtil;
@@ -25,6 +23,7 @@ import java.util.Optional;
 
 public class UpiServiceImpl implements UpiService {
 
+    private final PermissionService permissionService;
     private final UpiDao upiDao;
     private final UserDao userDao;
     private final BankAccountDao accountDao;
@@ -33,6 +32,7 @@ public class UpiServiceImpl implements UpiService {
         this.upiDao = new UpiDaoImpl(DatabaseUtil.getConnection());
         this.userDao = new UserDaoImpl(DatabaseUtil.getConnection());
         this.accountDao = new BankAccountDaoImpl(DatabaseUtil.getConnection());
+        this.permissionService = new PermissionServiceImpl();
     }
 
     @Override
@@ -48,7 +48,10 @@ public class UpiServiceImpl implements UpiService {
                 .upiPinHashed(BCrypt.hashpw(createUpiDTO.getUpiPin().toString(), BCrypt.gensalt()))
                 .userId(createUpiDTO.getUserId())
                 .build();
-        return upiDao.save(upi);
+        upi = upiDao.save(upi);
+        Permission permission = PermissionFactory.setPermissionObject(Transaction.PaymentMethod.UPI, upi.getUpiId());
+        permissionService.savePermission(permission);
+        return upi;
     }
 
     @Override
