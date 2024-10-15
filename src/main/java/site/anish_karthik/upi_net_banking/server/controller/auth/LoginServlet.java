@@ -36,18 +36,9 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         var sessionUser = SessionUserDTO.fromUser(userOpt.get());
-        // Create session
         HttpSession session = req.getSession(true);
         session.setAttribute("user", sessionUser);
 
-        // Set session cookie
-        Cookie sessionCookie = new Cookie("SESSIONID", session.getId());
-        sessionCookie.setHttpOnly(true);
-        sessionCookie.setSecure(true);
-        sessionCookie.setPath("/");
-        sessionCookie.setMaxAge(30 * 60); // 30 minutes expiration
-
-        resp.addCookie(sessionCookie);
         ResponseUtil.sendResponse(req, resp, HttpServletResponse.SC_OK, "Login successful", sessionUser);
     }
 }
