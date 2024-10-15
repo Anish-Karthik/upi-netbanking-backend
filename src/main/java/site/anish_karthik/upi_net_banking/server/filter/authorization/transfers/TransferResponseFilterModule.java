@@ -34,6 +34,7 @@ public class TransferResponseFilterModule extends BaseFilterModule implements Fi
     public TransferResponseFilterModule() {
         registerMethodFilter("GET", "/?", this::getOnlyCurrentUserTransactionsInTransfers);
         registerMethodFilter("GET", "/\\d+.*", this::getTransfer);
+        registerMethodFilter("POST", "/?", this::doNothing);
     }
 
     public void getOnlyCurrentUserTransactionsInTransfers(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
@@ -83,6 +84,25 @@ public class TransferResponseFilterModule extends BaseFilterModule implements Fi
                     Objects.equals(transfer.getPayerTransaction().getUserId(), user.getId()))) {
                 throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
             }
+
+            // Convert the modified response back to JSON
+            String modifiedJson = JsonUtilSoft.toJson(apiResponse);
+
+            // Send the modified JSON response
+            responseWrapper.setModifiedResponse(modifiedJson);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void doNothing(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        try {
+            CustomResponseWrapper responseWrapper = (CustomResponseWrapper) httpResponse;
+            System.out.println("HEY I'm A transfers response filter");
+            // Get the original JSON response
+            String originalJson = responseWrapper.getCapturedResponse();
+            // Deserialize the response using JsonUtilSoft
+            ApiResponse<GetTransferDTO> apiResponse = JsonUtilSoft.fromJson(originalJson, new TypeReference<ApiResponse<GetTransferDTO>>() {});
 
             // Convert the modified response back to JSON
             String modifiedJson = JsonUtilSoft.toJson(apiResponse);
