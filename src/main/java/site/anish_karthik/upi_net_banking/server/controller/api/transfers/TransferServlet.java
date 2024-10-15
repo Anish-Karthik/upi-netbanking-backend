@@ -1,13 +1,13 @@
 package site.anish_karthik.upi_net_banking.server.controller.api.transfers;
 
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.router.Router;
 
 import java.io.IOException;
 
-@WebServlet("/api/transfers/*")
-public class TransferController extends HttpServlet {
+public class TransferServlet extends HttpServlet {
     private Router router;
 
     @Override

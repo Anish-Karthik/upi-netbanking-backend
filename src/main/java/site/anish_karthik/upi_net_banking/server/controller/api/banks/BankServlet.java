@@ -1,7 +1,6 @@
-package site.anish_karthik.upi_net_banking.server.controller.api;
+package site.anish_karthik.upi_net_banking.server.controller.api.banks;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,8 +16,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-@WebServlet("/api/banks/*")
-public class BankController extends HttpServlet {
+public class BankServlet extends HttpServlet {
 
     private final BankService bankService;
     {

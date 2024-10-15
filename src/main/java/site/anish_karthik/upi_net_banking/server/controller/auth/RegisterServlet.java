@@ -1,23 +1,21 @@
 package site.anish_karthik.upi_net_banking.server.controller.auth;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import site.anish_karthik.upi_net_banking.server.dao.impl.UserDaoImpl;
 import site.anish_karthik.upi_net_banking.server.model.User;
 import site.anish_karthik.upi_net_banking.server.service.AuthService;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.HttpRequestParser;
-import site.anish_karthik.upi_net_banking.server.utils.JsonParser;
 import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 
-@WebServlet("/auth/register")
+
 public class RegisterServlet extends HttpServlet {
 
     private final AuthService authService;

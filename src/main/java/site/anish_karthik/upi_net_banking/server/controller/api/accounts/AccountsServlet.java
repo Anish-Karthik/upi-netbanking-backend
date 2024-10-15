@@ -1,7 +1,6 @@
 package site.anish_karthik.upi_net_banking.server.controller.api.accounts;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,7 +12,6 @@ import site.anish_karthik.upi_net_banking.server.service.impl.UpiServiceImpl;
 
 import java.io.IOException;
 
-@WebServlet("/api/accounts/*")
 public class AccountsServlet extends HttpServlet {
     private Router router;
 

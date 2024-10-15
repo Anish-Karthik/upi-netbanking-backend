@@ -1,13 +1,11 @@
 package site.anish_karthik.upi_net_banking.server.controller.auth;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 
 import java.io.IOException;
 
-@WebServlet("/auth/logout")
 public class LogoutServlet extends HttpServlet {
 
     @Override

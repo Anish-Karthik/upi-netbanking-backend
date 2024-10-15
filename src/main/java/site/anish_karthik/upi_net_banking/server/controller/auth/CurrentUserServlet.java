@@ -1,16 +1,15 @@
 package site.anish_karthik.upi_net_banking.server.controller.auth;
 
-import site.anish_karthik.upi_net_banking.server.dto.SessionUserDTO;
-import site.anish_karthik.upi_net_banking.server.model.User;
-
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import site.anish_karthik.upi_net_banking.server.dto.SessionUserDTO;
 import site.anish_karthik.upi_net_banking.server.utils.ResponseUtil;
 
 import java.io.IOException;
 
-@WebServlet(value = "/auth/current-user")
 public class CurrentUserServlet extends HttpServlet {
 
     @Override

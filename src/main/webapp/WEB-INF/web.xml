@@ -80,31 +80,80 @@
         <url-pattern>/api/upi/*</url-pattern>
     </filter-mapping>
 
-<!--        <servlet>-->
-<!--            <servlet-name>UpiController</servlet-name>-->
-<!--            <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.UpiController</servlet-class>-->
-<!--        </servlet>-->
-<!--        <servlet-mapping>-->
-<!--            <servlet-name>UpiController</servlet-name>-->
-<!--            <url-pattern>/api/accounts/*</url-pattern>-->
-<!--        </servlet-mapping>-->
 
-<!--        <servlet>-->
-<!--            <servlet-name>CardController</servlet-name>-->
-<!--            <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.CardController</servlet-class>-->
-<!--        </servlet>-->
-<!--        <servlet-mapping>-->
-<!--            <servlet-name>CardController</servlet-name>-->
-<!--            <url-pattern>/api/accounts/*</url-pattern>-->
-<!--        </servlet-mapping>-->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>site.anish_karthik.upi_net_banking.server.controller.auth.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/auth/login</url-pattern>
+    </servlet-mapping>
 
-<!--    <servlet>-->
-<!--        <servlet-name>DemoServlet</servlet-name>-->
-<!--        <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.DemoServlet</servlet-class>-->
-<!--    </servlet>-->
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>DemoServlet</servlet-name>-->
-<!--        <url-pattern>/demo*</url-pattern>-->
-<!--    </servlet-mapping>-->
+    <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>site.anish_karthik.upi_net_banking.server.controller.auth.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/auth/logout</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>RegisterServlet</servlet-name>
+        <servlet-class>site.anish_karthik.upi_net_banking.server.controller.auth.RegisterServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RegisterServlet</servlet-name>
+        <url-pattern>/auth/register</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CurrentUserServlet</servlet-name>
+        <servlet-class>site.anish_karthik.upi_net_banking.server.controller.auth.CurrentUserServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CurrentUserServlet</servlet-name>
+        <url-pattern>/auth/current-user</url-pattern>
+    </servlet-mapping>
+
+    <!-- API Endpoints -->
+
+    <servlet>
+        <servlet-name>UsersServlet</servlet-name>
+        <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.users.UserServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UsersServlet</servlet-name>
+        <url-pattern>/api/users/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AccountsServlet</servlet-name>
+        <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.accounts.AccountsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AccountsServlet</servlet-name>
+        <url-pattern>/api/accounts/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>TransferServlet</servlet-name>
+        <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.transfers.TransferServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TransferServlet</servlet-name>
+        <url-pattern>/api/transfers/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>BankServlet</servlet-name>
+        <servlet-class>site.anish_karthik.upi_net_banking.server.controller.api.banks.BankServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BankServlet</servlet-name>
+        <url-pattern>/api/bank/*</url-pattern>
+    </servlet-mapping>
+
 
 </web-app>
