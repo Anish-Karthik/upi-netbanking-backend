@@ -122,7 +122,8 @@ public class QueryBuilderUtil {
     public void executeDynamicQuery(Connection connection, QueryResult queryResult) throws SQLException {
         String query = queryResult.getQuery();
         List<Object> params = queryResult.getParameters();
-
+        System.out.println("Executing query: " + query);
+        System.out.println("With parameters: " + params);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             setParameters(stmt, params);
             stmt.executeUpdate();

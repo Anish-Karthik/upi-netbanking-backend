@@ -9,7 +9,6 @@ import site.anish_karthik.upi_net_banking.server.dao.impl.TransactionDaoImpl;
 import site.anish_karthik.upi_net_banking.server.factories.method.TransactionFactory;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory;
-import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.TransactionService;
 import site.anish_karthik.upi_net_banking.server.strategy.transactions.TransactionStrategy;

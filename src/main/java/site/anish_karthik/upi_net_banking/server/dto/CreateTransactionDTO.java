@@ -34,7 +34,7 @@ public class CreateTransactionDTO {
                 .byCardNo(byCardNo)
                 .upiId(upiId)
                 .pin(pin)
-                .startedAt(new Timestamp(System.currentTimeMillis()))
+                .startedAt(Timestamp.from(java.time.Instant.now()))
                 .transactionStatus(TransactionStatus.PROCESSING)
                 .build();
     }

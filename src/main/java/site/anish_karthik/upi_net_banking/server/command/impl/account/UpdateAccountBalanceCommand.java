@@ -1,7 +1,6 @@
 package site.anish_karthik.upi_net_banking.server.command.impl.account;
 
 import site.anish_karthik.upi_net_banking.server.command.Command;
-import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.TransactionStatus;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
@@ -32,7 +31,7 @@ public class UpdateAccountBalanceCommand implements Command {
         bankAccountService.updateAccountBalance(transaction);
         System.out.println("2::UpdateAccountBalanceCommand execute"+transaction);
         transaction.setTransactionStatus(TransactionStatus.SUCCESS);
-        transaction.setEndedAt(new Timestamp(System.currentTimeMillis()));
+        transaction.setEndedAt(Timestamp.from(java.time.Instant.now()));
         updateTransaction.apply(transaction);
         System.out.println("UpdateAccountBalanceCommand execute"+transaction);
     }
@@ -41,7 +40,7 @@ public class UpdateAccountBalanceCommand implements Command {
     public void undo() throws Exception {
         // DB level transaction management is handled, so no need to rollback here
         transaction.setTransactionStatus(TransactionStatus.FAILURE);
-        transaction.setEndedAt(new Timestamp(System.currentTimeMillis()));
+        transaction.setEndedAt(Timestamp.from(java.time.Instant.now()));
         updateTransaction.apply(transaction);
     }
 

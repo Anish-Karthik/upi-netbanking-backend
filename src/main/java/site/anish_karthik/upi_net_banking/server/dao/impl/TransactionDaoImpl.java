@@ -7,6 +7,7 @@ import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
+import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class TransactionDaoImpl implements TransactionDao {
             stmt.setLong(1, transactionId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToTransaction(rs));
+                return Optional.of(ResultSetMapper.mapResultSetToObject(rs, Transaction.class));
             }
             return Optional.empty();
         } catch (SQLException e) {
@@ -65,7 +66,7 @@ public class TransactionDaoImpl implements TransactionDao {
              ResultSet rs = stmt.executeQuery()) {
             List<Transaction> transactions = new ArrayList<>();
             while (rs.next()) {
-                transactions.add(mapResultSetToTransaction(rs));
+                transactions.add(ResultSetMapper.mapResultSetToObject(rs, Transaction.class));
             }
             return transactions;
         } catch (SQLException e) {
@@ -93,21 +94,6 @@ public class TransactionDaoImpl implements TransactionDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    private Transaction mapResultSetToTransaction(ResultSet rs) throws SQLException {
-        Transaction transaction = new Transaction();
-        transaction.setTransactionId(rs.getLong("transaction_id"));
-        transaction.setUserId(rs.getLong("user_id"));
-        transaction.setAccNo(rs.getString("acc_no"));
-        transaction.setAmount(rs.getBigDecimal("amount"));
-        transaction.setTransactionType(TransactionType.valueOf(rs.getString("transaction_type")));
-        transaction.setTransactionStatus(TransactionStatus.valueOf(rs.getString("transaction_status")));
-        transaction.setByCardNo(rs.getString("by_card_no"));
-        transaction.setUpiId(rs.getString("upi_id"));
-        transaction.setReferenceId(rs.getString("reference_id"));
-        return transaction;
     }
 
     @Override
@@ -145,7 +131,7 @@ public class TransactionDaoImpl implements TransactionDao {
             ResultSet rs = stmt.executeQuery();
             List<Transaction> transactions = new ArrayList<>();
             while (rs.next()) {
-                transactions.add(mapResultSetToTransaction(rs));
+                transactions.add(ResultSetMapper.mapResultSetToObject(rs, Transaction.class));
             }
             return transactions;
         } catch (SQLException e) {

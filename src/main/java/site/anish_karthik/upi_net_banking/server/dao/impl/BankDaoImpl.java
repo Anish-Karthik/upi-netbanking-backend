@@ -2,6 +2,7 @@ package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.BankDao;
 import site.anish_karthik.upi_net_banking.server.model.Bank;
+import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class BankDaoImpl implements BankDao {
             stmt.setLong(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToBank(rs));
+                return Optional.of(ResultSetMapper.mapResultSetToObject(rs, Bank.class));
             }
             return Optional.empty();
         } catch (SQLException e) {
@@ -55,7 +56,7 @@ public class BankDaoImpl implements BankDao {
              ResultSet rs = stmt.executeQuery()) {
             List<Bank> banks = new ArrayList<>();
             while (rs.next()) {
-                banks.add(mapResultSetToBank(rs));
+                banks.add(ResultSetMapper.mapResultSetToObject(rs, Bank.class));
             }
             return banks;
         } catch (SQLException e) {
@@ -95,7 +96,7 @@ public class BankDaoImpl implements BankDao {
             stmt.setString(1, code);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return mapResultSetToBank(rs);
+                return ResultSetMapper.mapResultSetToObject(rs, Bank.class);
             }
             return null;
         } catch (SQLException e) {
@@ -103,11 +104,4 @@ public class BankDaoImpl implements BankDao {
         }
     }
 
-    private Bank mapResultSetToBank(ResultSet rs) throws SQLException {
-        Bank bank = new Bank();
-        bank.setId(rs.getLong("id"));
-        bank.setName(rs.getString("name"));
-        bank.setCode(rs.getString("code"));
-        return bank;
-    }
 }

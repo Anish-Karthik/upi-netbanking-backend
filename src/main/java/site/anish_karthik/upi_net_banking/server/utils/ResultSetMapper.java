@@ -1,5 +1,7 @@
 package site.anish_karthik.upi_net_banking.server.utils;
 
+import site.anish_karthik.upi_net_banking.server.annotation.IgnoreField;
+
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -33,8 +35,7 @@ public class ResultSetMapper {
         typeConverters.put(java.sql.Date.class, value -> value instanceof Timestamp ? new java.sql.Date(((Timestamp) value).getTime()) : value);
         typeConverters.put(Timestamp.class, value -> value instanceof Timestamp ? (Timestamp) value : new Timestamp(((java.sql.Date) value).getTime()));
         typeConverters.put(BigDecimal.class, value -> new BigDecimal(value.toString()));
-        typeConverters.put(BigInteger.class, value -> ((BigInteger) value).longValue()); // Added converter for BigInteger
-        // Add more type converters as needed
+        typeConverters.put(BigInteger.class, value -> ((BigInteger) value).longValue());
     }
 
     public static <T> T mapResultSetToObject(ResultSet rs, Class<T> clazz) throws SQLException {
@@ -43,6 +44,10 @@ public class ResultSetMapper {
             Field[] fields = clazz.getDeclaredFields();
 
             for (Field field : fields) {
+                if (field.isAnnotationPresent(IgnoreField.class)) {
+                    System.out.println("Skipping field with @IgnoreField annotation");
+                    continue; // Skip fields with @IgnoreField annotation
+                }
                 field.setAccessible(true);
                 String columnName = toSnakeCase(field.getName());
                 Object value = rs.getObject(columnName);

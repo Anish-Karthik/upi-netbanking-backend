@@ -50,7 +50,7 @@ public class BeneficiaryDaoImpl implements BeneficiaryDao {
             stmt.setLong(1, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    beneficiaries.add(mapResultSetToBeneficiary(rs));
+                    beneficiaries.add(ResultSetMapper.mapResultSetToObject(rs, Beneficiary.class));
                 }
             }
         }
@@ -95,14 +95,4 @@ public class BeneficiaryDaoImpl implements BeneficiaryDao {
         return beneficiary;
     }
 
-    private Beneficiary mapResultSetToBeneficiary(ResultSet rs) throws Exception {
-        return Beneficiary.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .accNo(rs.getString("acc_no"))
-                .beneficiaryOfUserId(rs.getLong("beneficiary_of_user_id"))
-                .description(rs.getString("description"))
-                .upiId(rs.getString("upi_id"))
-                .build();
-    }
 }

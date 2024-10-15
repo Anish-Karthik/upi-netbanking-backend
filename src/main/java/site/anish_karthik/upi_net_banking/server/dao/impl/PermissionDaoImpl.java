@@ -94,5 +94,4 @@ public class PermissionDaoImpl implements PermissionDao {
             throw new RuntimeException("Error finding permission by accNo", e);
         }
     }
-
 }
