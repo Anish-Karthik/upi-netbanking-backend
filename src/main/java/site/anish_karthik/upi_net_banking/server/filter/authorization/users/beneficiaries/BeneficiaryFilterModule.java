@@ -81,12 +81,18 @@ public class BeneficiaryFilterModule extends BaseFilterModule implements FilterM
                 if (upi.isEmpty()) {
                     throw new ApiResponseException(HttpServletResponse.SC_NOT_FOUND, "UPI not found");
                 }
+                if (upi.get().getUserId().equals(createBeneficiaryDTO.getBeneficiaryOfUserId())) {
+                    throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "You cannot make your account as a beneficiary");
+                }
                 if(!upi.get().getAccNo().equals(createBeneficiaryDTO.getAccNo())) {
                     throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
                 }
                 Optional<BankAccount> bankAccount = bankAccountDao.findById(createBeneficiaryDTO.getAccNo());
                 if (bankAccount.isEmpty()) {
                     throw new ApiResponseException(HttpServletResponse.SC_NOT_FOUND, "Bank Account not found");
+                }
+                if (!bankAccount.get().getUserId().equals(createBeneficiaryDTO.getBeneficiaryOfUserId())) {
+                    throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "You cannot make your account as a beneficiary");
                 }
             }
         } catch (Exception e) {
