@@ -2,14 +2,15 @@ package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.TransactionDao;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
-import site.anish_karthik.upi_net_banking.server.model.enums.TransactionStatus;
-import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,30 +47,29 @@ public class TransactionDaoImpl implements TransactionDao {
 
     @Override
     public Optional<Transaction> findById(Long transactionId) {
-        String sql = "SELECT * FROM transaction WHERE transaction_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, transactionId);
-            ResultSet rs = stmt.executeQuery();
+        try {
+            QueryResult result = queryBuilderUtil.createSelectQuery(tableName, Transaction.builder().transactionId(transactionId).build());
+            ResultSet rs = queryBuilderUtil.executeDynamicSelectQuery(connection, result);
             if (rs.next()) {
                 return Optional.of(ResultSetMapper.mapResultSetToObject(rs, Transaction.class));
             }
             return Optional.empty();
-        } catch (SQLException e) {
+        } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public List<Transaction> findAll() {
-        String sql = "SELECT * FROM transaction";
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try {
+            QueryResult result = queryBuilderUtil.createSelectQuery(tableName,null);
+            ResultSet rs = queryBuilderUtil.executeDynamicSelectQuery(connection, result);
             List<Transaction> transactions = new ArrayList<>();
             while (rs.next()) {
-                transactions.add(ResultSetMapper.mapResultSetToObject(rs, Transaction.class));
+               transactions.add(ResultSetMapper.mapResultSetToObject(rs, Transaction.class));
             }
             return transactions;
-        } catch (SQLException e) {
+        } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -87,11 +87,10 @@ public class TransactionDaoImpl implements TransactionDao {
 
     @Override
     public void delete(Long id) {
-        String sql = "DELETE FROM transaction WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, id);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
+        try {
+            QueryResult result = queryBuilderUtil.createDeleteQuery(tableName, Transaction.builder().transactionId(id).build());
+            queryBuilderUtil.executeDynamicQuery(connection, result);
+        } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
