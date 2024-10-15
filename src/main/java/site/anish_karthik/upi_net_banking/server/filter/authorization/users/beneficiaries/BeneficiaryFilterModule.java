@@ -16,6 +16,8 @@ import site.anish_karthik.upi_net_banking.server.filter.FilterModule;
 import site.anish_karthik.upi_net_banking.server.model.BankAccount;
 import site.anish_karthik.upi_net_banking.server.model.Beneficiary;
 import site.anish_karthik.upi_net_banking.server.model.Upi;
+import site.anish_karthik.upi_net_banking.server.model.enums.AccountStatus;
+import site.anish_karthik.upi_net_banking.server.model.enums.UpiStatus;
 import site.anish_karthik.upi_net_banking.server.utils.HttpRequestParser;
 import site.anish_karthik.upi_net_banking.server.utils.PathParamExtractor;
 
@@ -87,12 +89,18 @@ public class BeneficiaryFilterModule extends BaseFilterModule implements FilterM
                 if(!upi.get().getAccNo().equals(createBeneficiaryDTO.getAccNo())) {
                     throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
                 }
+                if (upi.get().getStatus() != UpiStatus.ACTIVE) {
+                    throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "UPI is not active");
+                }
                 Optional<BankAccount> bankAccount = bankAccountDao.findById(createBeneficiaryDTO.getAccNo());
                 if (bankAccount.isEmpty()) {
                     throw new ApiResponseException(HttpServletResponse.SC_NOT_FOUND, "Bank Account not found");
                 }
                 if (!bankAccount.get().getUserId().equals(createBeneficiaryDTO.getBeneficiaryOfUserId())) {
                     throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "You cannot make your account as a beneficiary");
+                }
+                if (bankAccount.get().getStatus() != AccountStatus.ACTIVE) {
+                    throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "Bank Account is not active");
                 }
             }
         } catch (Exception e) {
