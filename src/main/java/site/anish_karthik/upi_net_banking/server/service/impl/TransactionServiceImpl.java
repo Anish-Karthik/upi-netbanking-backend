@@ -1,7 +1,6 @@
 package site.anish_karthik.upi_net_banking.server.service.impl;
 
 import site.anish_karthik.upi_net_banking.server.command.Command;
-import site.anish_karthik.upi_net_banking.server.command.GeneralCommand;
 import site.anish_karthik.upi_net_banking.server.command.impl.account.UpdateAccountBalanceCommand;
 import site.anish_karthik.upi_net_banking.server.command.impl.transaction.CreateTransactionCommand;
 import site.anish_karthik.upi_net_banking.server.command.invoker.TransferInvoker;
@@ -19,13 +18,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class TransactionServiceImpl implements TransactionService {
-    private final BankAccountService bankAccountService;
     private final TransactionDao transactionDao;
     private final TransactionFactory transactionFactory;
 
     public TransactionServiceImpl() {
         try {
-            this.bankAccountService = new BankAccountServiceImpl();
+            BankAccountService bankAccountService = new BankAccountServiceImpl();
             this.transactionFactory = new TransactionFactory(bankAccountService);
             this.transactionDao = new TransactionDaoImpl(DatabaseUtil.getConnection());
         } catch (SQLException | ClassNotFoundException e) {
@@ -34,7 +32,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction createTransaction(Transaction transaction) throws Exception {
+    public Transaction createTransaction(Transaction transaction) {
         System.out.println("TransactionServiceImpl createTransaction");
         return transactionDao.save(transaction);
     }
@@ -45,7 +43,7 @@ public class TransactionServiceImpl implements TransactionService {
         Command createTransactionCommand = new CreateTransactionCommand(transaction);
 
         invoker.addCommand(createTransactionCommand);
-        invoker.addCommand(executeTransactionCommand(transaction));
+        invoker.addCommand(new UpdateAccountBalanceCommand(transaction));
 
         try {
             invoker.executeSerially();
@@ -55,13 +53,6 @@ public class TransactionServiceImpl implements TransactionService {
         return transaction;
     }
 
-    @Override
-    public Command executeTransactionCommand(Transaction transaction) {
-        return new UpdateAccountBalanceCommand(transaction, (t) -> {
-             transactionDao.update(t);
-             return null;
-        });
-    }
 
     @Override
     public Transaction handleTransaction(Transaction transaction, TransactionCategory category, String pin) throws Exception {
@@ -71,22 +62,22 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void deleteTransaction(Long transactionId) throws Exception {
+    public void deleteTransaction(Long transactionId) {
         transactionDao.delete(transactionId);
     }
 
     @Override
-    public void updateTransaction(Transaction transaction) throws Exception {
+    public void updateTransaction(Transaction transaction) {
         transactionDao.update(transaction);
     }
 
     @Override
-    public Transaction getTransactionById(Long transactionId) throws Exception {
+    public Transaction getTransactionById(Long transactionId) {
         return transactionDao.findById(transactionId).orElseThrow(() -> new RuntimeException("Transaction not found"));
     }
 
     @Override
-    public List<Transaction> getTransactionsByAccNo(String accNo) throws Exception {
+    public List<Transaction> getTransactionsByAccNo(String accNo) {
         return transactionDao.findByAccNo(accNo);
     }
 

@@ -1,6 +1,7 @@
 package site.anish_karthik.upi_net_banking.server.service.impl;
 
 import site.anish_karthik.upi_net_banking.server.command.GeneralCommand;
+import site.anish_karthik.upi_net_banking.server.command.impl.account.UpdateAccountBalanceCommand;
 import site.anish_karthik.upi_net_banking.server.command.impl.transaction.CreateTransactionCommand;
 import site.anish_karthik.upi_net_banking.server.command.invoker.GeneralInvoker;
 import site.anish_karthik.upi_net_banking.server.command.invoker.TransferInvoker;
@@ -13,7 +14,6 @@ import site.anish_karthik.upi_net_banking.server.model.BankTransfer;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
 import site.anish_karthik.upi_net_banking.server.model.enums.*;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
-import site.anish_karthik.upi_net_banking.server.service.TransactionService;
 import site.anish_karthik.upi_net_banking.server.service.TransferService;
 import site.anish_karthik.upi_net_banking.server.strategy.transactions.TransactionStrategy;
 
@@ -24,12 +24,10 @@ import java.util.List;
 public class TransferServiceImpl implements TransferService {
     private final TransferDao transferDao;
     private final TransactionFactory transactionFactory;
-    private final TransactionService transactionService;
 
     public TransferServiceImpl() throws SQLException, ClassNotFoundException {
         BankAccountService bankAccountService = new BankAccountServiceImpl();
         transactionFactory = new TransactionFactory(bankAccountService);
-        transactionService = new TransactionServiceImpl();
         try {
             transferDao = new TransferDaoImpl();
         } catch (Exception e) {
@@ -134,8 +132,8 @@ public class TransferServiceImpl implements TransferService {
         };
         generalInvoker.addCommand(createTransferCommand);
         generalInvoker.addCommand(() -> {
-            invoker.addCommand(transactionService.executeTransactionCommand(payerTransaction));
-            invoker.addCommand(transactionService.executeTransactionCommand(payeeTransaction));
+            invoker.addCommand(new UpdateAccountBalanceCommand(payerTransaction));
+            invoker.addCommand(new UpdateAccountBalanceCommand(payeeTransaction));
             invoker.executeSerially();
         });
         GeneralCommand finalizeTransferCommand = () -> {
