@@ -86,7 +86,7 @@ public class BeneficiaryFilterModule extends BaseFilterModule implements FilterM
                 if (upi.get().getUserId().equals(createBeneficiaryDTO.getBeneficiaryOfUserId())) {
                     throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "You cannot make your account as a beneficiary");
                 }
-                if(!upi.get().getAccNo().equals(createBeneficiaryDTO.getAccNo())) {
+                if (!upi.get().getAccNo().equals(createBeneficiaryDTO.getAccNo())) {
                     throw new ApiResponseException(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
                 }
                 if (upi.get().getStatus() != UpiStatus.ACTIVE) {

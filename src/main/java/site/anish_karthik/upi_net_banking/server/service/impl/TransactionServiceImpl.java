@@ -1,6 +1,7 @@
 package site.anish_karthik.upi_net_banking.server.service.impl;
 
 import site.anish_karthik.upi_net_banking.server.command.Command;
+import site.anish_karthik.upi_net_banking.server.command.GeneralCommand;
 import site.anish_karthik.upi_net_banking.server.command.impl.account.UpdateAccountBalanceCommand;
 import site.anish_karthik.upi_net_banking.server.command.impl.transaction.CreateTransactionCommand;
 import site.anish_karthik.upi_net_banking.server.command.invoker.TransferInvoker;
@@ -44,28 +45,22 @@ public class TransactionServiceImpl implements TransactionService {
         Command createTransactionCommand = new CreateTransactionCommand(transaction);
 
         invoker.addCommand(createTransactionCommand);
-        executeTransaction(transaction, invoker);
-        return transaction;
-    }
-
-    @Override
-    public Transaction executeTransaction(Transaction transaction, TransferInvoker invoker) {
-        System.out.println("TransactionServiceImpl executeTransaction"+invoker.getCommands().size());
-        invoker.addCommand(new UpdateAccountBalanceCommand(transaction, (t) -> {
-            try {
-                transactionDao.update(t);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            return null;
-        }));
+        invoker.addCommand(executeTransactionCommand(transaction));
 
         try {
             invoker.executeSerially();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
         return transaction;
+    }
+
+    @Override
+    public Command executeTransactionCommand(Transaction transaction) {
+        return new UpdateAccountBalanceCommand(transaction, (t) -> {
+             transactionDao.update(t);
+             return null;
+        });
     }
 
     @Override

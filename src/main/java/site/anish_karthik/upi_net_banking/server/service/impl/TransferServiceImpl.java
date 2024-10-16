@@ -11,10 +11,7 @@ import site.anish_karthik.upi_net_banking.server.dto.GetTransferDTO;
 import site.anish_karthik.upi_net_banking.server.factories.method.TransactionFactory;
 import site.anish_karthik.upi_net_banking.server.model.BankTransfer;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
-import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory;
-import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
-import site.anish_karthik.upi_net_banking.server.model.enums.TransferStatus;
-import site.anish_karthik.upi_net_banking.server.model.enums.TransferType;
+import site.anish_karthik.upi_net_banking.server.model.enums.*;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.TransactionService;
 import site.anish_karthik.upi_net_banking.server.service.TransferService;
@@ -128,75 +125,33 @@ public class TransferServiceImpl implements TransferService {
         transfer.setPayerTransactionId(payerTransaction.getTransactionId());
         transfer.setTransferType(TransferType.valueOf(payerTransaction.getPaymentMethod().name()));
 
-        createTransfer(transfer, generalInvoker);
-        executePayerTransaction(payerTransaction, transfer, generalInvoker);
-        executePayeeTransaction(payeeTransaction, transfer, generalInvoker);
-        finalizeTransfer(transfer, generalInvoker);
-    }
-
-    private void createTransfer(BankTransfer transfer, GeneralInvoker invoker) {
         GeneralCommand createTransferCommand = () -> {
             transfer.setTransferStatus(TransferStatus.PROCESSING);
             transfer.setStartedAt(Timestamp.from(java.time.Instant.now()));
             transferDao.save(transfer);
+            payeeTransaction.setReferenceId(transfer.getReferenceId());
+            payerTransaction.setReferenceId(transfer.getReferenceId());
         };
-        invoker.addCommand(createTransferCommand);
-        System.out.println("transfer = " + transfer+" "+invoker.getCommands().size());
-    }
-
-    private void executePayerTransaction(Transaction payerTransaction, BankTransfer transfer, GeneralInvoker invoker) {
-        payerTransaction.setReferenceId(transfer.getReferenceId());
-        System.out.println("curr = " + invoker.getCommands().size());
-        invoker.addCommand(() -> transactionService.executeTransaction(payerTransaction, new TransferInvoker()));
-        System.out.println("payerTransaction = " + payerTransaction);
-        System.out.println(invoker.getCommands().size());
-        try {
-            System.out.println("Executing payer transaction");
-            invoker.executeInParallel();
-            System.out.println("Payer transaction executed");
-        } catch (Exception e) {
-            System.out.println("Error handling payer transaction");
-            handleTransactionFailure(transfer, invoker, "Error handling payer transaction", e);
-        }
-    }
-
-    private void executePayeeTransaction(Transaction payeeTransaction, BankTransfer transfer, GeneralInvoker invoker) {
-        payeeTransaction.setReferenceId(transfer.getReferenceId());
-        invoker.addCommand(() -> transactionService.executeTransaction(payeeTransaction, new TransferInvoker()));
-
-        try {
+        generalInvoker.addCommand(createTransferCommand);
+        generalInvoker.addCommand(() -> {
+            invoker.addCommand(transactionService.executeTransactionCommand(payerTransaction));
+            invoker.addCommand(transactionService.executeTransactionCommand(payeeTransaction));
             invoker.executeSerially();
-        } catch (Exception e) {
-            handleTransactionFailure(transfer, invoker, "Error handling payee transaction", e);
-        }
-    }
-
-    private void finalizeTransfer(BankTransfer transfer, GeneralInvoker invoker) {
-        invoker.addCommand(() -> {
-            transfer.setTransferStatus(TransferStatus.SUCCESS);
+        });
+        GeneralCommand finalizeTransferCommand = () -> {
+            if (payerTransaction.getTransactionStatus() == TransactionStatus.SUCCESS && payeeTransaction.getTransactionStatus() == TransactionStatus.SUCCESS ) {
+                transfer.setTransferStatus(TransferStatus.SUCCESS);
+            } else {
+                transfer.setTransferStatus(TransferStatus.FAILURE);
+            }
             transfer.setEndedAt(Timestamp.from(java.time.Instant.now()));
             transferDao.update(transfer);
-        });
-
+        };
+        generalInvoker.addCommand(finalizeTransferCommand);
         try {
-            invoker.executeSerially();
+            generalInvoker.executeSerially();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void handleTransactionFailure(BankTransfer transfer, GeneralInvoker invoker, String errorMessage, Exception e) {
-        invoker.addCommand(() -> {
-            transfer.setTransferStatus(TransferStatus.FAILURE);
-            transfer.setEndedAt(Timestamp.from(java.time.Instant.now()));
-            transferDao.update(transfer);
-        });
-
-        try {
-            invoker.executeSerially();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-        throw new RuntimeException(errorMessage, e);
     }
 }
