@@ -10,6 +10,7 @@ import site.anish_karthik.upi_net_banking.server.service.impl.BankAccountService
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Random;
 
 public class UpdateAccountBalanceCommand implements Command {
     private final Transaction transaction;
@@ -28,13 +29,13 @@ public class UpdateAccountBalanceCommand implements Command {
 
     @Override
     public void execute() throws Exception {
-        System.out.println("UpdateAccountBalanceCommand execute"+transaction);
+        System.out.println("UpdateAccountBalanceCommand execute" + transaction);
         bankAccountService.updateAccountBalance(transaction);
-        System.out.println("2::UpdateAccountBalanceCommand execute"+transaction);
+        System.out.println("2::UpdateAccountBalanceCommand execute" + transaction);
         transaction.setTransactionStatus(TransactionStatus.SUCCESS);
         transaction.setEndedAt(Timestamp.from(java.time.Instant.now()));
         transactionDao.update(transaction);
-        System.out.println("UpdateAccountBalanceCommand execute"+transaction);
+        System.out.println("UpdateAccountBalanceCommand execute" + transaction);
     }
 
     @Override

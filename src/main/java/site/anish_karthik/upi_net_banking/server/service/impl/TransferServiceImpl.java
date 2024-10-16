@@ -1,8 +1,8 @@
 package site.anish_karthik.upi_net_banking.server.service.impl;
 
 import site.anish_karthik.upi_net_banking.server.command.GeneralCommand;
-import site.anish_karthik.upi_net_banking.server.command.impl.account.UpdateAccountBalanceCommand;
 import site.anish_karthik.upi_net_banking.server.command.impl.transaction.CreateTransactionCommand;
+import site.anish_karthik.upi_net_banking.server.command.impl.transfer.CreateBankTransferCommand;
 import site.anish_karthik.upi_net_banking.server.command.invoker.GeneralInvoker;
 import site.anish_karthik.upi_net_banking.server.command.invoker.TransferInvoker;
 import site.anish_karthik.upi_net_banking.server.dao.TransferDao;
@@ -12,13 +12,13 @@ import site.anish_karthik.upi_net_banking.server.dto.GetTransferDTO;
 import site.anish_karthik.upi_net_banking.server.factories.method.TransactionFactory;
 import site.anish_karthik.upi_net_banking.server.model.BankTransfer;
 import site.anish_karthik.upi_net_banking.server.model.Transaction;
-import site.anish_karthik.upi_net_banking.server.model.enums.*;
+import site.anish_karthik.upi_net_banking.server.model.enums.TransactionCategory;
+import site.anish_karthik.upi_net_banking.server.model.enums.TransactionType;
 import site.anish_karthik.upi_net_banking.server.service.BankAccountService;
 import site.anish_karthik.upi_net_banking.server.service.TransferService;
 import site.anish_karthik.upi_net_banking.server.strategy.transactions.TransactionStrategy;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 
 public class TransferServiceImpl implements TransferService {
@@ -106,50 +106,22 @@ public class TransferServiceImpl implements TransferService {
 
     private void executeTransactions(Transaction payerTransaction, Transaction payeeTransaction, BankTransfer transfer) {
         TransferInvoker invoker = new TransferInvoker();
-        GeneralInvoker generalInvoker = new GeneralInvoker();
         invoker.addCommand(new CreateTransactionCommand(payerTransaction));
         invoker.addCommand(new CreateTransactionCommand(payeeTransaction));
-
         try {
             invoker.executeInParallel();
             System.out.println("Transactions created 1");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Transactions created");
-
-        // set the details of the transfer from the transactions
-        transfer.setPayeeTransactionId(payeeTransaction.getTransactionId());
-        transfer.setPayerTransactionId(payerTransaction.getTransactionId());
-        transfer.setTransferType(TransferType.valueOf(payerTransaction.getPaymentMethod().name()));
-
-        GeneralCommand createTransferCommand = () -> {
-            transfer.setTransferStatus(TransferStatus.PROCESSING);
-            transfer.setStartedAt(Timestamp.from(java.time.Instant.now()));
-            transferDao.save(transfer);
-            payeeTransaction.setReferenceId(transfer.getReferenceId());
-            payerTransaction.setReferenceId(transfer.getReferenceId());
-        };
-        generalInvoker.addCommand(createTransferCommand);
-        generalInvoker.addCommand(() -> {
-            invoker.addCommand(new UpdateAccountBalanceCommand(payerTransaction));
-            invoker.addCommand(new UpdateAccountBalanceCommand(payeeTransaction));
-            invoker.executeSerially();
-        });
-        GeneralCommand finalizeTransferCommand = () -> {
-            if (payerTransaction.getTransactionStatus() == TransactionStatus.SUCCESS && payeeTransaction.getTransactionStatus() == TransactionStatus.SUCCESS ) {
-                transfer.setTransferStatus(TransferStatus.SUCCESS);
-            } else {
-                transfer.setTransferStatus(TransferStatus.FAILURE);
-            }
-            transfer.setEndedAt(Timestamp.from(java.time.Instant.now()));
-            transferDao.update(transfer);
-        };
-        generalInvoker.addCommand(finalizeTransferCommand);
+        CreateBankTransferCommand createBankTransferCommand = new CreateBankTransferCommand(transfer, payerTransaction, payeeTransaction);
+        invoker.addCommand(createBankTransferCommand);
         try {
-            generalInvoker.executeSerially();
+            invoker.executeSerially();
+            System.out.println("Transactions created 2");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println("error = " + e.getMessage());
         }
+
     }
 }
