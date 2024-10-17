@@ -1,6 +1,8 @@
 package site.anish_karthik.upi_net_banking.server.dao.impl;
 
 import site.anish_karthik.upi_net_banking.server.dao.UserDao;
+import site.anish_karthik.upi_net_banking.server.dto.SessionUserDTO;
+import site.anish_karthik.upi_net_banking.server.dto.UserWithUPI;
 import site.anish_karthik.upi_net_banking.server.model.User;
 import site.anish_karthik.upi_net_banking.server.utils.DatabaseUtil;
 import site.anish_karthik.upi_net_banking.server.utils.QueryBuilderUtil;
@@ -8,9 +10,7 @@ import site.anish_karthik.upi_net_banking.server.utils.QueryResult;
 import site.anish_karthik.upi_net_banking.server.utils.ResultSetMapper;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class UserDaoImpl implements UserDao {
     private final Connection connection;
@@ -32,10 +32,10 @@ public class UserDaoImpl implements UserDao {
     public User save(User user) {
         String sql = "INSERT INTO user (name, email, phone, password, address, dob) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            setFields(user, stmt);
             stmt.executeUpdate();
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
+                user = ResultSetMapper.mapResultSetToObject(rs, User.class);
                 user.setId(rs.getLong(1));
             }
             return user;
@@ -105,6 +105,65 @@ public class UserDaoImpl implements UserDao {
         return getUser(accNo, sql);
     }
 
+    @Override
+    public List<UserWithUPI> findAllUsers(String search, Integer page, Integer size) {
+        List<UserWithUPI> users = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT u.id, u.name, u.email, u.phone FROM user u ");
+        if (search != null) {
+            sql.append("LEFT JOIN upi ON u.id = upi.user_id WHERE u.name LIKE ? OR u.email LIKE ? OR u.phone LIKE ? OR upi.upi_id LIKE ? ");
+        }
+        if (page != null && size != null) {
+            sql.append("LIMIT ? OFFSET ?");
+        }
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            if (search != null) {
+                for (int i = 0; i < 4; i++) {
+                    stmt.setString(paramIndex++, "%" + search + "%");
+                }
+            }
+            if (page != null && size != null) {
+                stmt.setInt(paramIndex++, size);
+                stmt.setInt(paramIndex, (page - 1) * size);
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            Map<Long, UserWithUPI> userMap = new HashMap<>();
+            while (rs.next()) {
+                Long userId = rs.getLong("id");
+                if (!userMap.containsKey(userId)) {
+                    UserWithUPI userWithUPI = UserWithUPI.builder()
+                            .id(userId)
+                            .name(rs.getString("name"))
+                            .email(rs.getString("email"))
+                            .phone(rs.getString("phone"))
+                            .upiIds(new ArrayList<>())
+                            .build();
+                    userMap.put(userId, userWithUPI);
+                }
+            }
+
+            if (!userMap.isEmpty()) {
+                String userIds = String.join(",", userMap.keySet().stream().map(String::valueOf).toArray(String[]::new));
+                String upiSql = "SELECT user_id, upi_id FROM upi WHERE user_id IN (" + userIds + ")";
+                try (PreparedStatement upiStmt = connection.prepareStatement(upiSql)) {
+                    ResultSet upiRs = upiStmt.executeQuery();
+                    while (upiRs.next()) {
+                        Long userId = upiRs.getLong("user_id");
+                        String upiId = upiRs.getString("upi_id");
+                        userMap.get(userId).getUpiIds().add(upiId);
+                    }
+                }
+            }
+
+            users = new ArrayList<>(userMap.values());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return users;
+    }
+
     private <T> Optional<User> getUser(T arg, String sql) {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             if (arg instanceof String) {
@@ -124,13 +183,4 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
-
-    private void setFields(User user, PreparedStatement stmt) throws SQLException {
-        stmt.setString(1, user.getName());
-        stmt.setString(2, user.getEmail());
-        stmt.setString(3, user.getPhone());
-        stmt.setString(4, user.getPassword());
-        stmt.setString(5, user.getAddress());
-        stmt.setDate(6, user.getDob());
-    }
 }

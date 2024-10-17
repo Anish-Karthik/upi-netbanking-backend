@@ -20,10 +20,12 @@ public class UserServlet extends HttpServlet {
         new BeneficiaryRouter().register(router);
         new ProfileRouter().register(router);
         new AccountRouter().register(router);
+        new UserRouter().register(router);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("GET request received"+req.getPathInfo());
         router.handle(req, resp);
     }
 
